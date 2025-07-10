@@ -1,0 +1,42 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":separateMultipleMajorReleases",
+    ":separatePatchReleases",
+    ":renovatePrefix",
+    ":semanticPrefixChore",
+    ":prHourlyLimitNone",
+    ":prConcurrentLimit10"
+  ],
+  "assigneesFromCodeOwners": true,
+  "automergeType": "pr",
+  "automergeStrategy": "rebase",
+  "baseBranches": [
+    "feat/service-api"
+  ],
+  "dependencyDashboard": true,
+  "internalChecksFilter": "strict",
+  "separateMinorPatch": true,
+  "stabilityDays": 3,
+  "rebaseWhen": "behind-base-branch",
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths",
+    "helmUpdateSubChartArchives"
+  ],
+  "labels": [
+    "🔨renovate"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "^Makefile$"
+      ],
+      "matchStrings": [
+        "datasource=(?<datasource>.*?)\\n\\s+go install github\\.com\\/(?<depName>.*?)@(?<currentValue>.*)"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ]
+}
