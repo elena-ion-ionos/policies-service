@@ -1,0 +1,4 @@
+ALTER TABLE frontend_keys ADD COLUMN IF NOT EXISTS created_by VARCHAR (320) DEFAULT '';
+ALTER TABLE frontend_keys ADD COLUMN IF NOT EXISTS created_by_user_id VARCHAR (36) DEFAULT '';
+ALTER TABLE frontend_keys ADD COLUMN IF NOT EXISTS updated_by VARCHAR (320) DEFAULT '';
+ALTER TABLE frontend_keys ADD COLUMN IF NOT EXISTS updated_by_user_id VARCHAR (36) DEFAULT '';

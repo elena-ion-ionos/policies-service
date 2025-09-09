@@ -1,0 +1,2 @@
+ALTER TABLE frontend_keys
+ADD COLUMN is_active BOOLEAN DEFAULT TRUE NOT NULL ;

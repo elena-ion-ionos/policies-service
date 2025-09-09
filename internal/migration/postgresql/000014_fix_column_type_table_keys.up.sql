@@ -1,0 +1,3 @@
+ALTER TABLE keys ALTER COLUMN created_at TYPE timestamp;
+ALTER TABLE keys ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE keys ALTER COLUMN created_at DROP DEFAULT;
