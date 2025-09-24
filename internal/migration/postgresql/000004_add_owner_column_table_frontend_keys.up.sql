@@ -1,2 +1,0 @@
-ALTER TABLE frontend_keys
-ADD COLUMN is_owner BOOLEAN DEFAULT TRUE NOT NULL ;

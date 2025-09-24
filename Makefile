@@ -28,7 +28,7 @@ generate:
 	$(GO) generate ./...
 
 docker-build: ## Build docker image
-	docker build -t $(TAG) --build-arg="GITHUB_TOKEN=$(GITHUB_TOKEN)" --build-arg="GITHUB_USER=$(GITHUB_USER)" --build-arg="GITHUB_PRIVATE_PATH=$(GITHUB_PRIVATE_PATH)" .
+	docker build -t $(TAG) --secret id=github_token .
 
 docker-push: docker-build## Push image
 	docker push $(TAG)

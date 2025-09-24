@@ -1,1 +1,0 @@
-DROP TABLE keys_ops_queue;
