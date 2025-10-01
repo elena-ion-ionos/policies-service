@@ -1,0 +1,159 @@
+---
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'cmd/**'
+      - 'internal/**'
+      - 'Dockerfile'
+      - 'pkg/**'
+  pull_request:
+    paths:
+      - 'cmd/**'
+      - 'internal/**'
+      - 'Dockerfile'
+      - 'pkg/**'
+
+name: Tests
+
+env:
+  GOPRIVATE: "github.com/ionos-cloud"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # The workflow sets up a PostgreSQL service container using the postgres image,
+    # configures the default password, and adds health checks to ensure it is running.
+    # It maps port 5432 from the container to the host for connectivity.
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          check-latest: true
+      - name: Install redis
+        run: sudo apt-get install redis-server
+      - name: Get token
+        id: get_token_pr
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.IONOS_CLOUD_REPO_READ_APP_ID }}
+          private_key: ${{ secrets.IONOS_CLOUD_REPO_READ_SECRET }}
+          # needed for local testing with act
+          github_api_url: https://api.github.com
+      - name: Configure git for private modules
+        run: git config --global url."https://x-access-token:${{ steps.get_token_pr.outputs.token }}@github.com/ionos-cloud".insteadOf "https://github.com/ionos-cloud"
+      - name: Cache Go Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-go-1
+      - name: Build
+        run: make build
+      - name: Vet
+        run: make vet
+      - name: Run Formation
+        run: make fmt
+      - name: Check if all generated files are either not added or up to date in git
+        run: if [[ -z $(git status --porcelain) ]]; then echo "ok"; else echo "Found modified files:"; git status --porcelain; exit 1; fi
+      - name: Ensure test database exists
+        run: |
+          psql "host=$PGHOST port=$PGPORT user=$PGUSER password=$PGPASSWORD sslmode=disable" -c "CREATE DATABASE test;" 2>/dev/null || true
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+      - name: Unit Tests
+        run: make test-all
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: test
+      - name: Test Report
+        uses: dorny/test-reporter@v2
+        if: success() || failure()
+        with:
+          name: Test results
+          path: ./build/reports/**-test.xml
+          reporter: java-junit
+          fail-on-error: 'true'
+      - name: Upload Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: ./build/reports/**
+
+  # Enable this job if you want to upload code coverage and test reports to SonarCloud
+  #  sonarcloud-analysis:
+  #    needs: [test]
+  #    runs-on: ubuntu-22.04
+  #    steps:
+  #      - name: Checkout code
+  #        uses: actions/checkout@v4
+  #        with:
+  #          fetch-depth: 0
+  #      - uses: actions/download-artifact@v4
+  #        with:
+  #          name: test-reports
+  #          path: ./build/reports
+  #      - name: SonarCloud Scan
+  #        uses: SonarSource/sonarcloud-github-action@master
+  #        env:
+  #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          check-latest: true
+      - name: Get token
+        id: get_token_pr
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.IONOS_CLOUD_REPO_READ_APP_ID }}
+          private_key: ${{ secrets.IONOS_CLOUD_REPO_READ_SECRET }}
+          # needed for local testing with act
+          github_api_url: https://api.github.com
+      - name: Configure git for private modules
+        run: git config --global url."https://x-access-token:${{ steps.get_token_pr.outputs.token }}@github.com/ionos-cloud".insteadOf "https://github.com/ionos-cloud"
+      - name: Cache Go Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Generate
+        run: make generate
+      - name: Lint
+        run: make lint
