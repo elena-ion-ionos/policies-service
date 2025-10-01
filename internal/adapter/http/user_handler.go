@@ -4,13 +4,16 @@ import (
 	"encoding/json"
 
 	"net/http"
+
+	"github.com/ionos-cloud/go-sample-service/internal/model"
+	"github.com/ionos-cloud/go-sample-service/internal/port"
 )
 
 type UserHandler struct {
-	service model.UserService
+	service port.UserService
 }
 
-func NewUserHandler(service model.UserService) *UserHandler {
+func NewUserHandler(service port.UserService) *UserHandler {
 	return &UserHandler{service: service}
 }
 

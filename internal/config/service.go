@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
 	"time"
+
+	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
 
 	"github.com/heptiolabs/healthcheck"
 	"github.com/jmoiron/sqlx"
@@ -54,6 +55,7 @@ func (co *Service) AddFlags(cmd *cobra.Command) {
 	cmd.Flags().DurationVar(&co.HealthCheckDbPingTimeoutSec, "health-check-db-ping-timeout-sec", defaultDbPingTimeoutSec, "Max allowed db connection timeout in seconds.")
 
 	co.Database.AddFlags(cmd)
+	co.HttpClient.AddFlags(cmd)
 }
 
 func (co *Service) ConfigureHealthCheckHandler(health healthcheck.Handler, db *sqlx.DB) error {

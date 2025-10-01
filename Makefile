@@ -8,7 +8,8 @@ VERSION ?= 0.0.1
 LDFLAGS ?= -ldflags "-X main.version=$(VERSION)"
 TAG ?= go-sample-service:latest
 ARGS ?= ""
-GITHUB_USER ?= ""
+GITHUB_USER ?= ""# make sure you dontt commit this with your real username
+GITHUB_TOKEN ?= ""# make sure you dontt commit this with your real token
 GITHUB_PRIVATE_PATH ?= "ionos-cloud"
 
 .PHONY: run
