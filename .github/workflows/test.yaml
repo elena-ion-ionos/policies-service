@@ -46,8 +46,6 @@ jobs:
         with:
           go-version-file: ./go.mod
           check-latest: true
-      - name: Install redis
-        run: sudo apt-get install redis-server
       - name: Get token
         id: get_token_pr
         uses: tibdex/github-app-token@v2
@@ -74,23 +72,8 @@ jobs:
         run: make fmt
       - name: Check if all generated files are either not added or up to date in git
         run: if [[ -z $(git status --porcelain) ]]; then echo "ok"; else echo "Found modified files:"; git status --porcelain; exit 1; fi
-      - name: Ensure test database exists
-        run: |
-          psql "host=$PGHOST port=$PGPORT user=$PGUSER password=$PGPASSWORD sslmode=disable" -c "CREATE DATABASE test;" 2>/dev/null || true
-        env:
-          PGHOST: localhost
-          PGPORT: 5432
-          PGUSER: postgres
-          PGPASSWORD: postgres
-          PGDATABASE: postgres
       - name: Unit Tests
-        run: make test-all
-        env:
-          PGHOST: localhost
-          PGPORT: 5432
-          PGUSER: postgres
-          PGPASSWORD: postgres
-          PGDATABASE: test
+        run: make test
       - name: Test Report
         uses: dorny/test-reporter@v2
         if: success() || failure()
