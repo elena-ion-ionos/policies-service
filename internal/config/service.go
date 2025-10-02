@@ -31,8 +31,6 @@ type Service struct {
 	HealthCheckDbPingTimeoutSec     time.Duration // Readiness check
 }
 
-const ()
-
 // MustInitConf returns the configuration for the application read from the environment variables or defaults.
 func (co *Service) MustInitConf() {
 	cmd := &cobra.Command{}

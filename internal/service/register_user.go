@@ -21,7 +21,6 @@ type registerUserImpl struct {
 }
 
 func MustNewRegisterUser(cfg *config.RegisterUser, fetcher port.UserFetcher, ctrl controller.RegisterUser) *registerUserImpl {
-
 	s := &registerUserImpl{
 		cfg:     cfg,
 		fetcher: fetcher,

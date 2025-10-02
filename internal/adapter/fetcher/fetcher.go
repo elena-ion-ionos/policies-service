@@ -7,8 +7,7 @@ import (
 	"github.com/ionos-cloud/go-sample-service/internal/model"
 )
 
-type fetcherImpl struct {
-}
+type fetcherImpl struct{}
 
 // NewFetcher creates a new instance of FetcherImpl.
 func NewFetcher() *fetcherImpl {

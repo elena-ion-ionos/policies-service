@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-
 	"net/http"
 
 	"github.com/ionos-cloud/go-sample-service/internal/model"
