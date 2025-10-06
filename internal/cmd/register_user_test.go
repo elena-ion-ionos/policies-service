@@ -1,13 +1,14 @@
-package config
+package cmd
 
 import (
 	"testing"
 
+	"github.com/ionos-cloud/go-sample-service/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
-func checkRegisterUser(t *testing.T, worker *RegisterUser, cmd *cobra.Command) {
+func checkRegisterUser(t *testing.T, worker *config.RegisterUser, cmd *cobra.Command) {
 	// Check Worker-specific flag
 	assert.NotNil(t, cmd.Flag("sample-int-option"))
 
@@ -19,7 +20,7 @@ func checkRegisterUser(t *testing.T, worker *RegisterUser, cmd *cobra.Command) {
 
 func TestWorker_AddFlags(t *testing.T) {
 	cmd := &cobra.Command{}
-	worker := &RegisterUser{}
+	worker := &config.RegisterUser{}
 	worker.AddFlags(cmd)
 	checkRegisterUser(t, worker, cmd)
 }

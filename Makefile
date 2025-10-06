@@ -28,6 +28,17 @@ tag-generate:
 generate:
 	$(GO) generate ./...
 
+.PHONY: api
+api: internal/api/api.gen.go
+
+internal/api:
+	mkdir -p $@
+
+.PHONY: internal/api/api.gen.go
+internal/api/api.gen.go: openapi/openapi.yaml openapi/config.yaml internal/api
+	$(GO_RUN_TOOLS) github.com/deepmap/oapi-codegen/cmd/oapi-codegen \
+		-config ./openapi/config.yaml $< > $@
+
 docker-build: ## Build docker image
 	docker build -t $(TAG) --secret id=github_token .
 

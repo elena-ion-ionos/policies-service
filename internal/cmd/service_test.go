@@ -1,4 +1,4 @@
-package config
+package cmd
 
 import (
 	"net/http"
@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/heptiolabs/healthcheck"
+	"github.com/ionos-cloud/go-sample-service/internal/config"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
-func checkService(t *testing.T, opts *Service, cmd *cobra.Command) {
+func checkService(t *testing.T, opts *config.Service, cmd *cobra.Command) {
 	// Check all Service-specific flags
 	assert.NotNil(t, cmd.Flag("metrics-port"))
 	assert.NotNil(t, cmd.Flag("health-check-port"))
@@ -25,14 +26,11 @@ func checkService(t *testing.T, opts *Service, cmd *cobra.Command) {
 	assert.Equal(t, "0.0.0.0:8082", opts.HealthCheckAddr)
 	assert.Equal(t, 10000, opts.HealthCheckMaxAllowedGoroutines)
 	assert.Equal(t, 3*time.Second, opts.HealthCheckDbPingTimeoutSec)
-
-	checkDatabase(t, &opts.Database, cmd)
-	checkHttpClient(t, &opts.HttpClient, cmd)
 }
 
 func TestCommonAddFlagsDefault(t *testing.T) {
 	cmd := &cobra.Command{}
-	opts := &Service{}
+	opts := &config.Service{}
 
 	opts.AddFlags(cmd)
 
@@ -64,14 +62,14 @@ func (m *mockHealthcheck) LiveEndpoint(http.ResponseWriter, *http.Request)  {}
 func (m *mockHealthcheck) ReadyEndpoint(http.ResponseWriter, *http.Request) {}
 
 func TestConfigureHealthCheckHandler_Valid(t *testing.T) {
-	opts := &Service{
+	opts := &config.Service{
 		HealthCheckMaxAllowedGoroutines: 10,
 		HealthCheckDbPingTimeoutSec:     2 * time.Second,
 	}
 	health := newMockHealthcheck()
 	db := &sqlx.DB{}
 
-	err := opts.ConfigureHealthCheckHandler(health, db)
+	err := ConfigureHealthCheckHandler(health, db, *opts)
 	assert.NoError(t, err)
 	assert.Contains(t, health.livenessChecks, "goroutine-threshold")
 	assert.NotNil(t, health.livenessChecks["goroutine-threshold"])
@@ -80,27 +78,27 @@ func TestConfigureHealthCheckHandler_Valid(t *testing.T) {
 }
 
 func TestConfigureHealthCheckHandler_InvalidGoroutines(t *testing.T) {
-	opts := &Service{
+	opts := &config.Service{
 		HealthCheckMaxAllowedGoroutines: 0,
 		HealthCheckDbPingTimeoutSec:     2 * time.Second,
 	}
 	health := newMockHealthcheck()
 	db := &sqlx.DB{}
 
-	err := opts.ConfigureHealthCheckHandler(health, db)
+	err := ConfigureHealthCheckHandler(health, db, *opts)
 	assert.Error(t, err)
 	assert.EqualError(t, err, "health-check-max-allowed-goroutines must be greater than 0")
 }
 
 func TestConfigureHealthCheckHandler_InvalidDbTimeout(t *testing.T) {
-	opts := &Service{
+	opts := &config.Service{
 		HealthCheckMaxAllowedGoroutines: 10,
 		HealthCheckDbPingTimeoutSec:     0,
 	}
 	health := newMockHealthcheck()
 	db := &sqlx.DB{}
 
-	err := opts.ConfigureHealthCheckHandler(health, db)
+	err := ConfigureHealthCheckHandler(health, db, *opts)
 	assert.Error(t, err)
 	assert.EqualError(t, err, "health-check-db-ping-timeout-sec must be greater than 0")
 }

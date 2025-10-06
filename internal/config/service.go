@@ -5,9 +5,6 @@ import (
 	"time"
 
 	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
-
-	"github.com/heptiolabs/healthcheck"
-	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -54,21 +51,4 @@ func (co *Service) AddFlags(cmd *cobra.Command) {
 
 	co.Database.AddFlags(cmd)
 	co.HttpClient.AddFlags(cmd)
-}
-
-func (co *Service) ConfigureHealthCheckHandler(health healthcheck.Handler, db *sqlx.DB) error {
-	if co.HealthCheckMaxAllowedGoroutines <= 0 {
-		return fmt.Errorf("health-check-max-allowed-goroutines must be greater than 0")
-	}
-	// It's fine to use a higher goroutine number here because v2 worker runs on multiple concurrent goroutines
-	health.AddLivenessCheck("goroutine-threshold", healthcheck.GoroutineCountCheck(co.HealthCheckMaxAllowedGoroutines))
-	// Our app is not ready if we can't resolve our upstream dependency in DNS.
-	// This checks we can get a connection to the db in a reasonable time. 3 sec might look too much but the system is
-	// still responsive even with 3 sec db timeout, TODO: consider lowering it once performance is stable.
-	if co.HealthCheckDbPingTimeoutSec == 0 {
-		return fmt.Errorf("health-check-db-ping-timeout-sec must be greater than 0")
-	}
-	health.AddReadinessCheck("database", healthcheck.DatabasePingCheck(db.DB, co.HealthCheckDbPingTimeoutSec))
-
-	return nil
 }

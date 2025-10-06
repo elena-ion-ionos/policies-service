@@ -6,21 +6,18 @@ import (
 	"strings"
 
 	"github.com/ionos-cloud/go-sample-service/internal/cmd"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var mainCmd = &cobra.Command{}
 
-// set during build
-var version = "unknown"
-
 func main() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
 
-	mainCmd.AddCommand(cmd.RegisterUser())
+	mainCmd.AddCommand(cmd.RegisterUserFunc())
+	mainCmd.AddCommand(cmd.WebserverUser())
 
 	if err := mainCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v", err)

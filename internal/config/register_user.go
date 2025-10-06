@@ -1,8 +1,6 @@
 package config
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 // Worker is the configuration for the worker.
 type RegisterUser struct {

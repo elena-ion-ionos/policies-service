@@ -9,12 +9,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type fakeDB struct{}
-
-func (f *fakeDB) Exec(query string, args ...interface{}) (interface{}, error)      { return nil, nil }
-func (f *fakeDB) Get(dest interface{}, query string, args ...interface{}) error    { return nil }
-func (f *fakeDB) Select(dest interface{}, query string, args ...interface{}) error { return nil }
-
 func TestUserRepoImpl_SaveAndFindByID(t *testing.T) {
 	// Use a real *sqlx.DB or a mock; here we use nil for brevity since methods are stubbed
 	repo := NewUserRepo((*sqlx.DB)(nil))

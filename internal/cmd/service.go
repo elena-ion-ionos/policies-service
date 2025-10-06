@@ -16,6 +16,7 @@ import (
 	"github.com/ionos-cloud/go-paaskit/api/paashttp/server"
 	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
 	"github.com/ionos-cloud/go-sample-service/internal/config"
+	"github.com/jmoiron/sqlx"
 )
 
 type Service struct {
@@ -25,7 +26,7 @@ type Service struct {
 	wg sync.WaitGroup
 
 	// main context of the service
-	ctx       context.Context
+	Ctx       context.Context
 	ctxCancel context.CancelFunc
 
 	// context used to start additional routines
@@ -57,7 +58,7 @@ func NewService(ctx context.Context, name string, cfg config.Service) (*Service,
 		wg:               sync.WaitGroup{},
 		routineCtx:       routineCtx,
 		routineCtxCancel: routineCtxCancel,
-		ctx:              serviceCtx,
+		Ctx:              serviceCtx,
 		ctxCancel:        serviceCxtCancel,
 	}
 
@@ -113,7 +114,7 @@ func (s *Service) StartObservabilityServer() {
 // The shutdown sequence will be done one time only.
 func (s *Service) TriggerShutdown(reason string) {
 	s.shutdownOnce.Do(func() {
-		ctx := s.ctx
+		ctx := s.Ctx
 		paaslog.InfoCf(ctx, "service %s shutdown triggered due to reason: `%s`", s.Name, reason)
 
 		// first shutdown routines
@@ -126,11 +127,11 @@ func (s *Service) TriggerShutdown(reason string) {
 
 // Wait will block until the service and all its goroutines have shutdown completely.
 func (s *Service) Wait() {
-	paaslog.InfoCf(s.ctx, "service %s started, entering wait", s.Name)
+	paaslog.InfoCf(s.Ctx, "service %s started, entering wait", s.Name)
 
 	s.wg.Wait()
 
-	paaslog.InfoCf(s.ctx, "service %s wait done", s.Name)
+	paaslog.InfoCf(s.Ctx, "service %s wait done", s.Name)
 }
 
 // StartRoutine can be used to start additional go routines which will be managed by the service.
@@ -212,4 +213,21 @@ func ListenAndServe(ctx context.Context, server *http.Server, shutdownTimeout ti
 	}
 
 	return err
+}
+
+func ConfigureHealthCheckHandler(health healthcheck.Handler, db *sqlx.DB, cfg config.Service) error {
+	if cfg.HealthCheckMaxAllowedGoroutines <= 0 {
+		return fmt.Errorf("health-check-max-allowed-goroutines must be greater than 0")
+	}
+	// It's fine to use a higher goroutine number here because v2 worker runs on multiple concurrent goroutines
+	health.AddLivenessCheck("goroutine-threshold", healthcheck.GoroutineCountCheck(cfg.HealthCheckMaxAllowedGoroutines))
+	// Our app is not ready if we can't resolve our upstream dependency in DNS.
+	// This checks we can get a connection to the db in a reasonable time. 3 sec might look too much but the system is
+	// still responsive even with 3 sec db timeout, TODO: consider lowering it once performance is stable.
+	if cfg.HealthCheckDbPingTimeoutSec == 0 {
+		return fmt.Errorf("health-check-db-ping-timeout-sec must be greater than 0")
+	}
+	health.AddReadinessCheck("database", healthcheck.DatabasePingCheck(db.DB, cfg.HealthCheckDbPingTimeoutSec))
+
+	return nil
 }
