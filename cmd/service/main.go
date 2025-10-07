@@ -20,7 +20,7 @@ func main() {
 	mainCmd.AddCommand(cmd.WebserverUser())
 
 	if err := mainCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "fatal error: %v", err)
+		fmt.Fprintf(os.Stderr, "error: %v", err)
 		os.Exit(1)
 	}
 }
