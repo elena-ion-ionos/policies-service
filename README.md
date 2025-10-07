@@ -46,3 +46,11 @@ After you have created the App, you will get the following credentials:
 
 You may need to set the sonar token as well if you want to use sonarcloud for code quality checks:
 - SONAR_TOKEN: The token for sonarcloud
+
+### Running the Service on a kubernetes cluster
+
+First you need to create a kubernetes cluster, you can use the Managed Kubernetes Service from IONOS Cloud.
+You can find the documentation here: [Managed Kubernetes Service](https://docs.ionos.com/cloud/containers/managed-kubernetes)
+You will need a cluster for each environment you want to deploy the service to.
+
+Alternatively, you can use any other kubernetes cluster if you have one available.
