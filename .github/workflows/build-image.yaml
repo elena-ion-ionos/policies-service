@@ -47,13 +47,28 @@ jobs:
           registry: ${{ vars.HARBOR_URL }}
           username: ${{ vars.HARBOR_USERNAME }}
           password: ${{ secrets.HARBOR_PASSWORD }}
-      - name: "Build Image"
-        run: |
-          make docker-build -e \
-          TAG=${{ vars.HARBOR_URL }}:${{ steps.image_tag.outputs.image_tag }} \
-          VERSION=${{ steps.image_tag.outputs.image_tag }} \
-          GITHUB_TOKEN=${{ steps.get_token_pr.outputs.token }} \
-          GITHUB_USER="x-access-token"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+#      - name: "Build Image"
+#        run: |
+#          make docker-build -e \
+#          TAG=${{ vars.HARBOR_URL }}:${{ steps.image_tag.outputs.image_tag }} \
+#          VERSION=${{ steps.image_tag.outputs.image_tag }} \
+#          GITHUB_TOKEN=${{ steps.get_token_pr.outputs.token }} \
+#          GITHUB_USER="x-access-token"
+      - name: Build docker image
+        id: docker_build
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          context: .
+          tags: |
+            ${{ vars.HARBOR_URL }}:${{ steps.image_tag.outputs.image_tag }}
+            ${{ vars.HARBOR_URL }}:latest
+          secrets: |
+            GIT_AUTH_TOKEN=${{ steps.get_token_pr.outputs.token }}
       - name: "Push Image to GitHub Packages Docker Registry"
         if: github.ref == 'refs/heads/main'
         run:
