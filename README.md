@@ -60,3 +60,7 @@ Alternatively, you can use any other kubernetes cluster if you have one availabl
 First you need to possess a cluster as we described above.
 Then you need to contact [Platform Framework](https://chat.google.com/room/AAAAwmSJfyo?cls=7) Team to bootstrap the cluster for you.
 You can start from here: [Documentation](https://confluence.united-internet.org/spaces/ICDEV/pages/267005963/Developer+Platform+Service+Catalog)
+
+#### Steps to get the host for your service
+In case your service needs to be exposed via an ingress controller, you need to get a host for your service.
+You can start from here: [OneDNS Documentation](https://confluence.united-internet.org/spaces/ICDEV/pages/267006202/Howto+create+a+new+location+zone)
