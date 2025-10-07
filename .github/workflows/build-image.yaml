@@ -58,25 +58,32 @@ jobs:
 #          VERSION=${{ steps.image_tag.outputs.image_tag }} \
 #          GITHUB_TOKEN=${{ steps.get_token_pr.outputs.token }} \
 #          GITHUB_USER="x-access-token"
+      - name: Check if can be pushed
+        id: check_push
+        run: |
+          echo "is_pushable=$(if [ '${{ github.ref }}' == 'refs/heads/main' ]; \
+          then echo true;\
+          else echo false;\
+          fi)" >> "$GITHUB_OUTPUT"
       - name: Build docker image
         id: docker_build
         uses: docker/build-push-action@v6
         with:
-          push: false
+          push: ${{ steps.check_push.outputs.is_pushable }}
           context: .
           tags: |
             ${{ vars.HARBOR_URL }}:${{ steps.image_tag.outputs.image_tag }}
             ${{ vars.HARBOR_URL }}:latest
           secrets: |
             GIT_AUTH_TOKEN=${{ steps.get_token_pr.outputs.token }}
-      - name: "Push Image to GitHub Packages Docker Registry"
-        if: github.ref == 'refs/heads/main'
-        run:
-          docker push ${{ vars.HARBOR_URL }}:${{ steps.image_tag.outputs.image_tag }} \
-      - name: "Push Image to GitHub Packages Docker Registry with latest tag"
-        if: github.ref == 'refs/heads/main'
-        run:
-          docker push ${{ vars.HARBOR_URL }}:latest \
+#      - name: "Push Image to GitHub Packages Docker Registry"
+#        if: github.ref == 'refs/heads/main'
+#        run:
+#          docker push ${{ vars.HARBOR_URL }}:${{ steps.image_tag.outputs.image_tag }} \
+#      - name: "Push Image to GitHub Packages Docker Registry with latest tag"
+#        if: github.ref == 'refs/heads/main'
+#        run:
+#          docker push ${{ vars.HARBOR_URL }}:latest \
 
 # Uncomment the following lines to enable deployment dispatch
 #      - name: "Deploy the new image"
