@@ -2,10 +2,10 @@ FROM golang:1.25-alpine AS builder
 
 RUN apk add --no-cache git
 
-#RUN --mount=type=secret,id=github_token \
-#    git config --global \
-#      url."https://x-access-token:$(cat /run/secrets/github_token)@github.com/ionos-cloud".insteadOf \
-#      "https://github.com/ionos-cloud"
+RUN --mount=type=secret,id=GIT_AUTH_TOKEN \
+    git config --global \
+      url."https://x-access-token:$(cat /run/secrets/github_token)@github.com/ionos-cloud".insteadOf \
+      "https://github.com/ionos-cloud"
 
 COPY go.mod go.sum Makefile /src/
 COPY cmd/ /src/cmd/
