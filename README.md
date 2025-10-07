@@ -54,3 +54,9 @@ You can find the documentation here: [Managed Kubernetes Service](https://docs.i
 You will need a cluster for each environment you want to deploy the service to.
 
 Alternatively, you can use any other kubernetes cluster if you have one available.
+
+#### Steps to create bootstrap cluster dev/test/prod environments
+
+First you need to possess a cluster as we described above.
+Then you need to contact [Platform Framework](https://chat.google.com/room/AAAAwmSJfyo?cls=7) Team to bootstrap the cluster for you.
+You can start from here: [Documentation](https://confluence.united-internet.org/spaces/ICDEV/pages/267005963/Developer+Platform+Service+Catalog)
