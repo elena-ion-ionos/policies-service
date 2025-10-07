@@ -130,4 +130,4 @@ tolerations: []
 
 affinity: {}
 monitoring:
-  enabled: true
+  enabled: false
