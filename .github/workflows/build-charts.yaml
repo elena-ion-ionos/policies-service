@@ -1,0 +1,98 @@
+---
+name: Build Helm Chart and Push to Registry
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'helm-chart/**'
+  pull_request:
+    paths:
+      - 'helm-chart/**'
+jobs:
+  build-helm-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Lint Helm chart"
+        run: |
+          helm lint helm-chart/application
+
+  push-helm-chart:
+    if: github.ref == 'refs/heads/main' || contains(join(github.event.pull_request.labels.*.name, '-'), 'dev')
+    needs:
+      - build-helm-chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Check if Chart.yaml has changed"
+        uses: tj-actions/changed-files@v46
+        id: chart_changed
+        with:
+          files: "helm-chart/application/Chart.yaml"
+          since_last_remote_commit: true
+      - name: "Check if was not a change in Chart.yaml"
+        if: steps.chart_changed.outputs.any_changed == 'false'
+        run: |
+            echo "No changes in Chart.yaml, skipping chart push"
+      - name: "Capture Git Commit SHA"
+        run: echo "COMMIT_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: "Get Chart version"
+        id: chart_version
+        if: steps.chart_changed.outputs.any_changed == 'true'
+        uses: mikefarah/yq@v4.45.1
+        with:
+          cmd: |
+            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              echo "chart_version=$(yq e '.version' helm-chart/application/Chart.yaml)" >> "$GITHUB_OUTPUT"
+            else
+              echo "chart_version=$(yq e '.version' helm-chart/application/Chart.yaml)-${{ env.COMMIT_SHA }}" >> "$GITHUB_OUTPUT"
+            fi
+      - name: "Push Helm chart to Dev Helm-Repository"
+        if: steps.chart_changed.outputs.any_changed == 'true'
+        env:
+          REGISTRY: ${{ vars.HARBOR_URL }}
+          USERNAME: ${{ vars.HARBOR_USERNAME }}
+          PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
+
+          CHART_NAME: go-sample-service # TODO change this to the name of the service
+          CHART_VERSION: ${{ steps.chart_version.outputs.chart_version }}
+        run: |
+          cd helm-chart
+          helm registry login "${REGISTRY}" \
+          -u "${USERNAME}" \
+          -p "${PASSWORD}"
+
+          helm package application --version "${CHART_VERSION}"
+          helm push "${CHART_NAME}"-"${CHART_VERSION}".tgz oci://"${REGISTRY}"/helm
+      - name: Determine environment
+        if: steps.chart_changed.outputs.any_changed == 'true'
+        id: determine_env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "env=staging" >> "$GITHUB_ENV"
+          else
+            echo "env=${{ join(github.event.pull_request.labels.*.name, '-') }}" >> "$GITHUB_ENV"
+          fi
+
+# Uncomment the following section if you want to trigger the deployment workflow automatically after pushing the chart
+#      - name: "Bump helm chart version"
+#        if: steps.chart_changed.outputs.any_changed == 'true'
+#        uses: mvasigh/dispatch-action@main
+#        with:
+#          token: ${{ secrets.DISPATCH_TOKEN }}
+#          repo: platform-s3-deployment
+#          owner: ionos-cloud
+#          event_type: bump-helm-chart-multiple-env
+#          message: |
+#            {
+#              "environment": "${{ env.env }}",
+#              "helm_chart": "${{ steps.chart_version.outputs.chart_version }}"
+#            }
