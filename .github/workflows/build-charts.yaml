@@ -62,7 +62,7 @@ jobs:
           USERNAME: ${{ vars.HARBOR_USERNAME }}
           PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
 
-          CHART_NAME: go-sample-service # TODO change this to the name of the service
+          CHART_NAME: app # TODO change this to the name of the service
           CHART_VERSION: ${{ steps.chart_version.outputs.chart_version }}
         run: |
           cd helm-chart
