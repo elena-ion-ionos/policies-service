@@ -58,7 +58,7 @@ jobs:
       - name: "Push Helm chart to Dev Helm-Repository"
         if: steps.chart_changed.outputs.any_changed == 'true'
         env:
-          REGISTRY: ${{ vars.HARBOR_URL }}/helm
+          REGISTRY: ${{ vars.HARBOR_URL }}
           USERNAME: ${{ vars.HARBOR_USERNAME }}
           PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
 
