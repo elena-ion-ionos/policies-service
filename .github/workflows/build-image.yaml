@@ -44,7 +44,7 @@ jobs:
       - name: "[Docker] Login to GitHub Packages Docker Registry"
         uses: docker/login-action@v3
         with:
-          registry: ${{ vars.HARBOR_URL }}
+          registry: ${{ vars.HARBOR_URL }}/rest-image
           username: ${{ vars.HARBOR_USERNAME }}
           password: ${{ secrets.HARBOR_PASSWORD }}
       - name: Set up QEMU
