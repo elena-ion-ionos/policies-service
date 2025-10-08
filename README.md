@@ -74,3 +74,14 @@ To automatize the deployment, you can create a workflow similar to the one in th
 [Example Workflow](https://github.com/ionos-cloud/platform-s3-deployment/actions/workflows/bump-image-tag.yml)
 This needs to be dispatched automatically [Here](https://github.com/ionos-cloud/go-sample-service/actions/runs/18314015515/workflow)
 You need to uncomment the last step in the workflow file and adjust the parameters accordingly.
+
+#### Grafana and monitoring
+
+To activate the monitoring we need to make active the pod monitor by setting the value to true in the values.yaml file. (monitoring.enabled: true)
+This will create a PodMonitor resource that will be picked up by the Prometheus Operator.
+The Prometheus Operator is already installed in the bootstrap cluster.
+https://confluence.united-internet.org/spaces/PAAS/pages/226559976/Monitoring+%F0%9F%93%88
+
+To create custom dashboards in Grafana you can follow the example from [S3-mgmt-service dashboards](https://grafana-rw.tp.infra.cluster.ionos.com/dashboards/f/df06izrbbiqyoc/s3-mgmt)
+You can add any custom dashboard you want. But make sure that after you finish you will add the 'sync' label to the dashboard.
+This will make sure that the dashboard will be saved in the git repository and will not be lost.
