@@ -47,7 +47,7 @@ After you have created the App, you will get the following credentials:
 You may need to set the sonar token as well if you want to use sonarcloud for code quality checks:
 - SONAR_TOKEN: The token for sonarcloud
 
-### Running the Service on a kubernetes cluster
+#### Running the Service on a kubernetes cluster
 
 First you need to create a kubernetes cluster, you can use the Managed Kubernetes Service from IONOS Cloud.
 You can find the documentation here: [Managed Kubernetes Service](https://docs.ionos.com/cloud/containers/managed-kubernetes)
@@ -62,26 +62,16 @@ Then you need to contact [Platform Framework](https://chat.google.com/room/AAAAw
 You can start from here: [Documentation](https://confluence.united-internet.org/spaces/ICDEV/pages/267005963/Developer+Platform+Service+Catalog)
 
 #### Steps to get the host for your service
+
 In case your service needs to be exposed via an ingress controller, you need to get a host for your service.
 You can start from here: [OneDNS Documentation](https://confluence.united-internet.org/spaces/ICDEV/pages/267006202/Howto+create+a+new+location+zone)
 
 #### Steps to deploy the service to the kubernetes cluster
 
 To deploy the service you will need a repository where you will store the helm charts and the kubernetes manifests.
-An example of such a repository is: []platform-s3-deployment](https://github.com/ionos-cloud/platform-s3-deployment)
+An example of such a repository is: [platform-s3-deployment](https://github.com/ionos-cloud/platform-s3-deployment)
 
 To automatize the deployment, you can create a workflow similar to the one in the
 [Example Workflow](https://github.com/ionos-cloud/platform-s3-deployment/actions/workflows/bump-image-tag.yml)
 This needs to be dispatched automatically [Here](https://github.com/ionos-cloud/go-sample-service/actions/runs/18314015515/workflow)
 You need to uncomment the last step in the workflow file and adjust the parameters accordingly.
-
-#### Grafana and monitoring
-
-To activate the monitoring we need to make active the pod monitor by setting the value to true in the values.yaml file. (monitoring.enabled: true)
-This will create a PodMonitor resource that will be picked up by the Prometheus Operator.
-The Prometheus Operator is already installed in the bootstrap cluster.
-https://confluence.united-internet.org/spaces/PAAS/pages/226559976/Monitoring+%F0%9F%93%88
-
-To create custom dashboards in Grafana you can follow the example from [S3-mgmt-service dashboards](https://grafana-rw.tp.infra.cluster.ionos.com/dashboards/f/df06izrbbiqyoc/s3-mgmt)
-You can add any custom dashboard you want. But make sure that after you finish you will add the 'sync' label to the dashboard.
-This will make sure that the dashboard will be saved in the git repository and will not be lost.
