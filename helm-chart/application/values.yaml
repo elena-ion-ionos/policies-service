@@ -2,9 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-replicaCount: 1
-
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   repository: harbor.infra.cluster.ionos.com/go-sample-service/rest-image
@@ -12,6 +9,11 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "20251007.132012-18314015515-81de6ab"
+  pullExternalSecret:
+    harbor:
+      enabled: true
+      secretName: go-pull-secret
+      secretPath: go-sample-service-pull
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -131,3 +133,5 @@ tolerations: []
 affinity: {}
 monitoring:
   enabled: false
+
+vaultPath: platform-s3/data/cluster/s3-dev-fra
