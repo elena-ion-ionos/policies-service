@@ -1,0 +1,28 @@
+---
+name: Continuous Delivery
+on:
+  repository_dispatch:
+    types: [deploy]
+env:
+  image_tag: ${{ github.event.client_payload.message.image_tag }}
+
+jobs:
+  send-google-chat-msg:
+    name: Send google chat msg
+    runs-on: [ provisioning-platform-runner ]
+    steps:
+      - name: "Notify Google Chat for success deployment on Dev environment"
+        env:
+          WEBHOOK_URL: ${{ secrets.CHAT_ENDPOINT }}
+          CHAT_MESSAGE: >-
+            The application version ${{ env.image_tag }} has been deployed to the Dev environment :tada:
+        run: |
+          # HINT (threadKey): notifications with the same threadKey go to the same chat thread
+          THREAD_KEY=$(date +%Y%m%d)
+          curl \
+            --location \
+            --request POST \
+            --header 'Content-Type: application/json' \
+            --silent --show-error \
+            --data-raw "{\"text\": \"${CHAT_MESSAGE}\"}" \
+            "${WEBHOOK_URL}&threadKey=${THREAD_KEY}"
