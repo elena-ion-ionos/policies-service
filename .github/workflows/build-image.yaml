@@ -44,7 +44,7 @@ jobs:
       - name: "[Docker] Login to GitHub Packages Docker Registry"
         uses: docker/login-action@v3
         with:
-          registry: ${{ vars.HARBOR_URL }}/rest-image
+          registry: ${{ vars.HARBOR_URL }}
           username: ${{ vars.HARBOR_USERNAME }}
           password: ${{ secrets.HARBOR_PASSWORD }}
       - name: Set up QEMU
@@ -72,8 +72,8 @@ jobs:
           push: ${{ steps.check_push.outputs.is_pushable }}
           context: .
           tags: |
-            ${{ vars.HARBOR_URL }}:${{ steps.image_tag.outputs.image_tag }}
-            ${{ vars.HARBOR_URL }}:latest
+            ${{ vars.HARBOR_URL }}/rest-image:${{ steps.image_tag.outputs.image_tag }}
+            ${{ vars.HARBOR_URL }}/rest-image:latest
           secrets: |
             GIT_AUTH_TOKEN=${{ steps.get_token_pr.outputs.token }}
 #      - name: "Push Image to GitHub Packages Docker Registry"
