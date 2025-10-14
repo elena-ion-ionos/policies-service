@@ -71,6 +71,8 @@ jobs:
         with:
           push: ${{ steps.check_push.outputs.is_pushable }}
           context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ vars.HARBOR_URL }}/rest-image:${{ steps.image_tag.outputs.image_tag }}
             ${{ vars.HARBOR_URL }}/rest-image:latest
