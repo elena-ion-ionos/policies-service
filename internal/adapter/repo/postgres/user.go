@@ -8,7 +8,9 @@ import (
 
 	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
 	"github.com/ionos-cloud/go-paaskit/service/contract"
+	"github.com/ionos-cloud/go-sample-service/internal/metrics"
 	"github.com/ionos-cloud/go-sample-service/internal/model"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -43,9 +45,13 @@ func txRollback(ctx context.Context, tx *sql.Tx) {
 }
 
 func (r *userRepoImpl) Save(ctx context.Context, user *model.User) error {
+	timer := prometheus.NewTimer(metrics.OpsDurationSeconds.WithLabelValues(metrics.LabelOperation_SaveUser, metrics.LabelLocation_Repo))
+	defer timer.ObserveDuration()
+
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		paaslog.ErrorCf(ctx, "Error starting transaction: %v", err)
+		metrics.OpsNo.WithLabelValues(metrics.LabelOperation_SaveUser, metrics.LabelLocation_Repo, metrics.LabelResult_fail).Inc()
 		return err
 	}
 	defer txRollback(ctx, tx)
@@ -53,8 +59,10 @@ func (r *userRepoImpl) Save(ctx context.Context, user *model.User) error {
 	_, err = createKeyWTx(ctx, tx, user)
 	if err != nil {
 		paaslog.ErrorCf(ctx, "Error creating user: %v", err)
+		metrics.OpsNo.WithLabelValues(metrics.LabelOperation_SaveUser, metrics.LabelLocation_Repo, metrics.LabelResult_fail).Inc()
 		return err
 	}
+	metrics.OpsNo.WithLabelValues(metrics.LabelOperation_SaveUser, metrics.LabelLocation_Repo, metrics.LabelResult_success).Inc()
 	return tx.Commit()
 }
 
@@ -65,15 +73,19 @@ func createKeyWTx(ctx context.Context, tx *sql.Tx, key *model.User) (*model.User
 }
 
 func (r *userRepoImpl) FindByID(ctx context.Context, userID uuid.UUID) (*model.User, error) {
+	timer := prometheus.NewTimer(metrics.OpsDurationSeconds.WithLabelValues(metrics.LabelOperation_FindUserById, metrics.LabelLocation_Repo))
+	defer timer.ObserveDuration()
 	// Query user from DB (omitted for brevity)
 	var dboUser UserDBO
 
 	err := r.db.GetContext(ctx, &dboUser, getUserByIdQueryStr, userID)
 	if err != nil {
 		paaslog.ErrorCf(ctx, "Error querying user by ID: %v", err)
+		metrics.OpsNo.WithLabelValues(metrics.LabelOperation_FindUserById, metrics.LabelLocation_Repo, metrics.LabelResult_fail).Inc()
 		return nil, err
 	}
 
+	metrics.OpsNo.WithLabelValues(metrics.LabelOperation_FindUserById, metrics.LabelLocation_Repo, metrics.LabelResult_success).Inc()
 	return &model.User{
 		UserID:         dboUser.ID,
 		Phone:          dboUser.Phone,

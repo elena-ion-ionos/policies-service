@@ -40,15 +40,12 @@ func TestUserRepoImpl_SaveAndFindByID(t *testing.T) {
 		}
 	})
 
-	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
-	u, err := url.Parse(connStr)
+	connStr, _ := pgContainer.ConnectionString(ctx, "sslmode=disable")
+
+	u, _ := url.Parse(connStr)
 	host, port := u.Hostname(), u.Port()
 
 	paaslog.InfoCf(ctx, "Test db connection string: %s", connStr)
-
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	cfg := config.Database{
 		Database: dbName,
