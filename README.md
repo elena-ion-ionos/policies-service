@@ -66,6 +66,8 @@ You can start from here: [Documentation](https://confluence.united-internet.org/
 In case your service needs to be exposed via an ingress controller, you need to get a host for your service.
 You can start from here: [OneDNS Documentation](https://confluence.united-internet.org/spaces/ICDEV/pages/267006202/Howto+create+a+new+location+zone)
 
+### CD Workflows
+
 #### Steps to deploy the service to the kubernetes cluster
 
 To deploy the service you will need a repository where you will store the helm charts and the kubernetes manifests.
@@ -75,3 +77,16 @@ To automatize the deployment, you can create a workflow similar to the one in th
 [Example Workflow](https://github.com/ionos-cloud/platform-s3-deployment/actions/workflows/bump-image-tag.yml)
 This needs to be dispatched automatically [Here](https://github.com/ionos-cloud/go-sample-service/actions/runs/18314015515/workflow)
 You need to uncomment the last step in the workflow file and adjust the parameters accordingly.
+
+#### Teleport Access
+
+To access the kubernetes cluster you will need to use Teleport.
+There is a CD job that will connect you to the cluster via Teleport to check if the deployment was successful.
+For this you will need to add TELEPORT_TOKEN in the github secrets and TELEPORT_CLUSTER as well in the github variables.
+You may also need to set up your teleport bot user to have access to the cluster. Here is the documentation: [Teleport Documentation](https://confluence.united-internet.org/spaces/PAAS/pages/226559777/Use+Teleport+Access+within+Github+Actions)
+
+#### Chat announcements
+You can also set up chat announcements for the deployment status.
+You will need to create a webhook in the chat room where you want to receive the announcements.
+After that you need to set the following environment variables in the github secrets:
+- CHAT_ENDPOINT
