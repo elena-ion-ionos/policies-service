@@ -69,3 +69,38 @@ jobs:
             --silent --show-error \
             --data-raw "{\"text\": \"${CHAT_MESSAGE}\"}" \
             "${WEBHOOK_URL}&threadKey=${THREAD_KEY}"
+
+  create-ticket:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Generate Change Ticket
+        id: change_ticket
+        uses: ionos-cloud/tosm-ticket-creator/v2@main
+        with:
+          JIRA_URL: ${{ vars.JIRA_URL }}
+          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
+          JIRA_PASSWORD: ${{ secrets.JIRA_PASSWORD }}
+          TICKET_SIZE: "S"
+          GHCR_USERNAME: ${{ github.actor }}
+          GHCR_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          CREATE_TOSM_EVENT: |
+            {
+              "Project": "TECCM",
+              "Issue Type": "Change S",
+              "Labels": "s3-key-management-service",
+              "Summary": "S3-mgmt-${{ env.image_tag }} Release Information",
+              "Affected Business Units and Products (Tree)": [
+                 "IONOS Cloud/IONOS Cloud Customer Interaction Systems (IC-CIS)/IC-Cloud REST API"
+              ],
+              "Description": "We will deploy a new version for S3 mgmt. New image tag: ${{ env.image_tag }}",
+              "Environments": "Live",
+              "Change Owner": "${{ github.actor }}",
+              "Change Manager": "${{ vars.MANAGER }}",
+              "Reporter": "${{ github.actor }}",
+              "Responsible Entity": "${{ vars.RESPONSIBLE_ENTITY }}",
+              "Risk Consequence": "1",
+              "Risk Probability": "1",
+              "QA Status": "green"
+            }
