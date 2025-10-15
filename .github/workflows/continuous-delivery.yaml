@@ -22,7 +22,7 @@ jobs:
         uses: ionos-cloud/paas-github-actions/tools/teleport@0.12.2
         id: teleport-fragment
         with:
-          teleport-token: ${{ vars.TELEPORT_TOKEN }}
+          teleport-token: ${{ secrets.TELEPORT_TOKEN }}
           teleport-k8s-cluster: ${{ vars.TELEPORT_CLUSTER }}
 
       - name: Get the image tag from the dev and check deployment status
