@@ -67,7 +67,6 @@ func TestHttpClient_applyToTransport(t *testing.T) {
 		// (since Go does not expose closure internals, just check that it works)
 		ctx := context.Background()
 		_, _ = tr.DialContext(ctx, "tcp", "localhost:80")
-		// If needed, you can test by wrapping DialContext in a test double
 	}
 }
 
