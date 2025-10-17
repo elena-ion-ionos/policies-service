@@ -90,3 +90,19 @@ You can also set up chat announcements for the deployment status.
 You will need to create a webhook in the chat room where you want to receive the announcements.
 After that you need to set the following environment variables in the github secrets:
 - CHAT_ENDPOINT
+
+#### Creating TOSM Tickets
+We have a GitHub Action to create TOSM tickets for your changes automatically.
+You just need to add the github secrets [here](https://github.com/ionos-cloud/go-sample-service/settings/secrets/actions):
+- JIRA_USERNAME: The username of the Jira user
+- JIRA_PASSWORD: The password of the Jira user
+
+For this you need to create a service account in EIAM and ask for permisison in a JIRA ticket like: [JSD-4570](https://hosting-jira.1and1.org/browse/JSD-4570)
+
+You will also need to set the github vars [here](https://github.com/ionos-cloud/go-sample-service/settings/variables/actions):
+- RESPONSIBLE_ENTITY
+- JIRA_URL
+- MANAGER
+- OWNER
+
+To enable the tosm ticket creation you need also to ask for read permission on the tosm-ticket-creator repository for your repository. You can ask [here](https://chat.google.com/room/AAAADTJNi4U?cls=7)
