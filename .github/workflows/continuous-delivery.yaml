@@ -89,16 +89,17 @@ jobs:
             {
               "Project": "TECCM",
               "Issue Type": "Change S",
-              "Labels": "s3-key-management-service",
-              "Summary": "S3-mgmt-${{ env.image_tag }} Release Information",
+              "Labels": "go-sample-service",
+              "Summary": "Go-Sample-Service-${{ env.image_tag }} Release Information",
               "Affected Business Units and Products (Tree)": [
-                 "IONOS Cloud/IONOS Cloud Customer Interaction Systems (IC-CIS)/IC-Cloud REST API"
+                "IONOS Cloud/IONOS Cloud Operations Support Systems (IC-OSS)/IC-Storage Platform",
+                "IONOS Cloud/IONOS Cloud Product Service Systems (IC-PSS)/IC-S3 Object Storage"
               ],
-              "Description": "We will deploy a new version for S3 mgmt. New image tag: ${{ env.image_tag }}",
+              "Description": "We will deploy a new version for Go-sample-service. New image tag: ${{ env.image_tag }}",
               "Environments": "Live",
-              "Change Owner": "${{ github.actor }}",
+              "Change Owner": "${{ vars.OWNER }}",
               "Change Manager": "${{ vars.MANAGER }}",
-              "Reporter": "${{ github.actor }}",
+              "Reporter": "${{ vars.REPORTER }}",
               "Responsible Entity": "${{ vars.RESPONSIBLE_ENTITY }}",
               "Risk Consequence": "1",
               "Risk Probability": "1",
