@@ -99,7 +99,7 @@ jobs:
               "Environments": "Live",
               "Change Owner": "${{ vars.OWNER }}",
               "Change Manager": "${{ vars.MANAGER }}",
-              "Reporter": "${{ vars.REPORTER }}",
+              "Reporter": "${{ vars.ASSIGNEE }}",
               "Responsible Entity": "${{ vars.RESPONSIBLE_ENTITY }}",
               "Risk Consequence": "1",
               "Risk Probability": "1",
