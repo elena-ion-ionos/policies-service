@@ -135,3 +135,7 @@ monitoring:
   enabled: false
 
 vaultPath: platform-s3/data/cluster/s3-dev-fra
+env: {}
+#  LOG_LEVEL: info
+#  DB_HOST: db.example.com
+#  DB_PORT: "5432"

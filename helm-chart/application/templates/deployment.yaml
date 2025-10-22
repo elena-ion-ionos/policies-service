@@ -66,6 +66,10 @@ spec:
           {{- end }}
           args:
             - webserver-user
+          envFrom:
+            - configMapRef:
+                name: {{ include "app.fullname" . }}-config
+                optional: true
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
