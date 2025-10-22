@@ -61,6 +61,8 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          args:
+            - webserver-user
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
