@@ -4,6 +4,6 @@ kind: ConfigMap
 metadata:
   name: {{ include "app.fullname" . }}-config
 data:
-    {{- range $key, $value := .Values.env }}
-    {{ $key }}: "{{ $value | quote }}"
-    {{- end }}
+  {{- range $key, $value := .Values.env }}
+  {{ $key }}: "{{ $value | quote }}"
+  {{- end }}
