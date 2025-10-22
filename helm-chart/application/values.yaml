@@ -136,6 +136,8 @@ monitoring:
 
 vaultPath: platform-s3/data/cluster/s3-dev-fra
 env: {}
+secret:
+  secretPath: platform-s3/data/cluster/s3-dev-fra
 #  LOG_LEVEL: info
 #  DB_HOST: db.example.com
 #  DB_PORT: "5432"

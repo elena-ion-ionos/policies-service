@@ -67,8 +67,8 @@ spec:
           args:
             - webserver-user
           envFrom:
-            - configMapRef:
-                name: {{ include "app.fullname" . }}-config
+            - secretRef:
+                name: {{ include "app.fullname" . }}-secrets
                 optional: true
       {{- with .Values.volumes }}
       volumes:
