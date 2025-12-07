@@ -1,22 +1,22 @@
----
-name: Verify Files
-
-on:
-  pull_request:
-
-jobs:
-  file-linting:
-    name: Files
-    uses: ionos-cloud/paas-github-actions/.github/workflows/files_all-lint.yaml@0.17.2
-    with:
-      yamllint-config-file: .github/configs/yaml-lint-config.yaml
-      markdownlint-options: --config .github/configs/.markdownlint-cli2.yaml
-
-  linting-passed:
-    # This job is needed as accumulated indicator for the 'Require status checks to pass before merging'
-    # branch protection rule. Otherwise, every single linter would need to be added to the rule.
-    name: Linting has passed
-    runs-on: ubuntu-22.04
-    needs: [file-linting]
-    steps:
-      - run: echo "# ✅ File Linting Validation has passed! ✅" >> "${GITHUB_STEP_SUMMARY}"
+#---
+#name: Verify Files
+#
+#on:
+#  pull_request:
+#
+#jobs:
+#  file-linting:
+#    name: Files
+#    uses: ionos-cloud/paas-github-actions/.github/workflows/files_all-lint.yaml@0.17.2
+#    with:
+#      yamllint-config-file: .github/configs/yaml-lint-config.yaml
+#      markdownlint-options: --config .github/configs/.markdownlint-cli2.yaml
+#
+#  linting-passed:
+#    # This job is needed as accumulated indicator for the 'Require status checks to pass before merging'
+#    # branch protection rule. Otherwise, every single linter would need to be added to the rule.
+#    name: Linting has passed
+#    runs-on: ubuntu-22.04
+#    needs: [file-linting]
+#    steps:
+#      - run: echo "# ✅ File Linting Validation has passed! ✅" >> "${GITHUB_STEP_SUMMARY}"

@@ -1,111 +1,111 @@
----
-name: Continuous Delivery
-on:
-  repository_dispatch:
-    types: [deploy]
-env:
-  image_tag: ${{ github.event.client_payload.message.image_tag }}
-
-jobs:
-  check-deployment-status-for-dev:
-    runs-on: ubuntu-latest
-#    outputs:
-#      status: ${{ steps.get-deployment-status-for-dev.outputs.deploy_status }}
-    permissions:
-      id-token: write
-      contents: write
-    steps:
-      - name: Install Kubectl
-        uses: azure/setup-kubectl@v4
-
-      - name: Connect to cluster via Teleport
-        uses: ionos-cloud/paas-github-actions/tools/teleport@0.12.2
-        id: teleport-fragment
-        with:
-          teleport-token: ${{ secrets.TELEPORT_TOKEN }}
-          teleport-k8s-cluster: ${{ vars.TELEPORT_CLUSTER }}
-
-      - name: Get the image tag from the dev and check deployment status
-        id: get-deployment-status-for-dev
-        run: |
-          i=0
-          while [ $i -lt 60 ]; do
-            latest_image_tag_api_pod=$(kubectl get deployment s3-staging-api -n s3 -o jsonpath="{.spec.template.spec.containers[0].image}" | cut -d ":" -f 2)
-            latest_image_tag_worker_pod=$(kubectl get pod -n s3 -l app.kubernetes.io/name=s3-worker -o jsonpath='{.items[*].spec.containers[*].image}' | cut -d: -f2)
-            echo "$latest_image_tag_api_pod"
-            echo "$latest_image_tag_worker_pod"
-            echo "${{ env.image_tag }}"
-            if [ "$latest_image_tag_api_pod" = "$latest_image_tag_worker_pod" ] && [ "$latest_image_tag_api_pod" = "${{ env.image_tag }}" ]; then
-              echo "The deployment is finished with success"
-              echo "deploy_status=success" >> "$GITHUB_OUTPUT"
-              break
-            fi
-            echo "The deployment is not yet successful. Retry after 10 seconds"
-            i=$((i+1))
-            sleep 10
-          done
-          if [ $i -eq 60 ]; then
-          echo "The deployment has failed after 10 minutes. Failing the workflow"
-          echo "deploy_status=failure" >> "$GITHUB_OUTPUT"
-          fi
-
-
-  send-google-chat-msg:
-    name: Send google chat msg
-    runs-on: [ provisioning-platform-runner ]
-    steps:
-      - name: "Notify Google Chat for success deployment on Dev environment"
-        env:
-          WEBHOOK_URL: ${{ secrets.CHAT_ENDPOINT }}
-          CHAT_MESSAGE: >-
-            The application version ${{ env.image_tag }} has been deployed to the Dev environment :tada:
-        run: |
-          # HINT (threadKey): notifications with the same threadKey go to the same chat thread
-          THREAD_KEY=$(date +%Y%m%d)
-          curl \
-            --location \
-            --request POST \
-            --header 'Content-Type: application/json' \
-            --silent --show-error \
-            --data-raw "{\"text\": \"${CHAT_MESSAGE}\"}" \
-            "${WEBHOOK_URL}&threadKey=${THREAD_KEY}"
-
-  create-ticket:
-    # The type of runner that the job will run on
-    runs-on: provisioning-platform-runner
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    permissions:
-      id-token: write
-      contents: read
-      packages: read
-    steps:
-      - name: Generate Change Ticket
-        id: change_ticket
-        uses: ionos-cloud/tosm-ticket-creator/v2@main
-        with:
-          JIRA_URL: ${{ vars.JIRA_URL }}
-          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
-          JIRA_PASSWORD: ${{ secrets.JIRA_PASSWORD }}
-          TICKET_SIZE: "S"
-          GHCR_USERNAME: ${{ github.actor }}
-          GHCR_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          CREATE_TOSM_EVENT: |
-            {
-              "Project": "TECCM",
-              "Issue Type": "Change S",
-              "Labels": "policies-service",
-              "Summary": "Go-Sample-Service-${{ env.image_tag }} Release Information",
-              "Affected Business Units and Products (Tree)": [
-                "IONOS Cloud/IONOS Cloud Operations Support Systems (IC-OSS)/IC-Storage Platform",
-                "IONOS Cloud/IONOS Cloud Product Service Systems (IC-PSS)/IC-S3 Object Storage"
-              ],
-              "Description": "We will deploy a new version for Go-sample-service. New image tag: ${{ env.image_tag }}",
-              "Environments": "Live",
-              "Change Owner": "${{ vars.OWNER }}",
-              "Change Manager": "${{ vars.MANAGER }}",
-              "Reporter": "${{ vars.MANAGER }}",
-              "Responsible Entity": "${{ vars.RESPONSIBLE_ENTITY }}",
-              "Risk Consequence": "1",
-              "Risk Probability": "1",
-              "QA Status": "green"
-            }
+#---
+#name: Continuous Delivery
+#on:
+#  repository_dispatch:
+#    types: [deploy]
+#env:
+#  image_tag: ${{ github.event.client_payload.message.image_tag }}
+#
+#jobs:
+#  check-deployment-status-for-dev:
+#    runs-on: ubuntu-latest
+##    outputs:
+##      status: ${{ steps.get-deployment-status-for-dev.outputs.deploy_status }}
+#    permissions:
+#      id-token: write
+#      contents: write
+#    steps:
+#      - name: Install Kubectl
+#        uses: azure/setup-kubectl@v4
+#
+#      - name: Connect to cluster via Teleport
+#        uses: ionos-cloud/paas-github-actions/tools/teleport@0.12.2
+#        id: teleport-fragment
+#        with:
+#          teleport-token: ${{ secrets.TELEPORT_TOKEN }}
+#          teleport-k8s-cluster: ${{ vars.TELEPORT_CLUSTER }}
+#
+#      - name: Get the image tag from the dev and check deployment status
+#        id: get-deployment-status-for-dev
+#        run: |
+#          i=0
+#          while [ $i -lt 60 ]; do
+#            latest_image_tag_api_pod=$(kubectl get deployment s3-staging-api -n s3 -o jsonpath="{.spec.template.spec.containers[0].image}" | cut -d ":" -f 2)
+#            latest_image_tag_worker_pod=$(kubectl get pod -n s3 -l app.kubernetes.io/name=s3-worker -o jsonpath='{.items[*].spec.containers[*].image}' | cut -d: -f2)
+#            echo "$latest_image_tag_api_pod"
+#            echo "$latest_image_tag_worker_pod"
+#            echo "${{ env.image_tag }}"
+#            if [ "$latest_image_tag_api_pod" = "$latest_image_tag_worker_pod" ] && [ "$latest_image_tag_api_pod" = "${{ env.image_tag }}" ]; then
+#              echo "The deployment is finished with success"
+#              echo "deploy_status=success" >> "$GITHUB_OUTPUT"
+#              break
+#            fi
+#            echo "The deployment is not yet successful. Retry after 10 seconds"
+#            i=$((i+1))
+#            sleep 10
+#          done
+#          if [ $i -eq 60 ]; then
+#          echo "The deployment has failed after 10 minutes. Failing the workflow"
+#          echo "deploy_status=failure" >> "$GITHUB_OUTPUT"
+#          fi
+#
+#
+#  send-google-chat-msg:
+#    name: Send google chat msg
+#    runs-on: [ provisioning-platform-runner ]
+#    steps:
+#      - name: "Notify Google Chat for success deployment on Dev environment"
+#        env:
+#          WEBHOOK_URL: ${{ secrets.CHAT_ENDPOINT }}
+#          CHAT_MESSAGE: >-
+#            The application version ${{ env.image_tag }} has been deployed to the Dev environment :tada:
+#        run: |
+#          # HINT (threadKey): notifications with the same threadKey go to the same chat thread
+#          THREAD_KEY=$(date +%Y%m%d)
+#          curl \
+#            --location \
+#            --request POST \
+#            --header 'Content-Type: application/json' \
+#            --silent --show-error \
+#            --data-raw "{\"text\": \"${CHAT_MESSAGE}\"}" \
+#            "${WEBHOOK_URL}&threadKey=${THREAD_KEY}"
+#
+#  create-ticket:
+#    # The type of runner that the job will run on
+#    runs-on: provisioning-platform-runner
+#    # Steps represent a sequence of tasks that will be executed as part of the job
+#    permissions:
+#      id-token: write
+#      contents: read
+#      packages: read
+#    steps:
+#      - name: Generate Change Ticket
+#        id: change_ticket
+#        uses: ionos-cloud/tosm-ticket-creator/v2@main
+#        with:
+#          JIRA_URL: ${{ vars.JIRA_URL }}
+#          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
+#          JIRA_PASSWORD: ${{ secrets.JIRA_PASSWORD }}
+#          TICKET_SIZE: "S"
+#          GHCR_USERNAME: ${{ github.actor }}
+#          GHCR_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+#          CREATE_TOSM_EVENT: |
+#            {
+#              "Project": "TECCM",
+#              "Issue Type": "Change S",
+#              "Labels": "policies-service",
+#              "Summary": "Go-Sample-Service-${{ env.image_tag }} Release Information",
+#              "Affected Business Units and Products (Tree)": [
+#                "IONOS Cloud/IONOS Cloud Operations Support Systems (IC-OSS)/IC-Storage Platform",
+#                "IONOS Cloud/IONOS Cloud Product Service Systems (IC-PSS)/IC-S3 Object Storage"
+#              ],
+#              "Description": "We will deploy a new version for Go-sample-service. New image tag: ${{ env.image_tag }}",
+#              "Environments": "Live",
+#              "Change Owner": "${{ vars.OWNER }}",
+#              "Change Manager": "${{ vars.MANAGER }}",
+#              "Reporter": "${{ vars.MANAGER }}",
+#              "Responsible Entity": "${{ vars.RESPONSIBLE_ENTITY }}",
+#              "Risk Consequence": "1",
+#              "Risk Probability": "1",
+#              "QA Status": "green"
+#            }
