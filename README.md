@@ -75,7 +75,7 @@ An example of such a repository is: [platform-s3-deployment](https://github.com/
 
 To automatize the deployment, you can create a workflow similar to the one in the
 [Example Workflow](https://github.com/ionos-cloud/platform-s3-deployment/actions/workflows/bump-image-tag.yml)
-This needs to be dispatched automatically [Here](https://github.com/ionos-cloud/go-sample-service/actions/runs/18314015515/workflow)
+This needs to be dispatched automatically [Here](https://github.com/ionos-cloud/policies-service/actions/runs/18314015515/workflow)
 You need to uncomment the last step in the workflow file and adjust the parameters accordingly.
 
 #### Teleport Access
@@ -93,13 +93,13 @@ After that you need to set the following environment variables in the github sec
 
 #### Creating TOSM Tickets
 We have a GitHub Action to create TOSM tickets for your changes automatically.
-You just need to add the github secrets [here](https://github.com/ionos-cloud/go-sample-service/settings/secrets/actions):
+You just need to add the github secrets [here](https://github.com/ionos-cloud/policies-service/settings/secrets/actions):
 - JIRA_USERNAME: The username of the Jira user
 - JIRA_PASSWORD: The password of the Jira user
 
 For this you need to create a service account in EIAM and ask for permisison in a JIRA ticket like: [JSD-4570](https://hosting-jira.1and1.org/browse/JSD-4570)
 
-You will also need to set the github vars [here](https://github.com/ionos-cloud/go-sample-service/settings/variables/actions):
+You will also need to set the github vars [here](https://github.com/ionos-cloud/policies-service/settings/variables/actions):
 - RESPONSIBLE_ENTITY
 - JIRA_URL
 - MANAGER

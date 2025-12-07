@@ -41,9 +41,9 @@ func (co *Service) MustInitConf() {
 
 // AddFlags adds the flags for the worker.
 func (co *Service) AddFlags(cmd *cobra.Command) {
-	cmd.Flags().IntVar(&co.MetricsPort, "metrics-port", 8081, "Port to start the metrics API on.")
+	cmd.Flags().IntVar(&co.MetricsPort, "metrics-port", 8091, "Port to start the metrics API on.")
 	co.MetricsAddr = fmt.Sprintf(":%d", co.MetricsPort)
-	cmd.Flags().IntVar(&co.HealthCheckPort, "health-check-port", 8082, "Port to start the health check API on.")
+	cmd.Flags().IntVar(&co.HealthCheckPort, "health-check-port", 8092, "Port to start the health check API on.")
 	co.HealthCheckAddr = fmt.Sprintf("0.0.0.0:%d", co.HealthCheckPort)
 
 	cmd.Flags().IntVar(&co.HealthCheckMaxAllowedGoroutines, "health-check-max-allowed-goroutines", defaultMaxAllowedGoroutines, "Max allowed no of goroutines per service.")

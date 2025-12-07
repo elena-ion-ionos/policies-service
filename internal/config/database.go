@@ -7,8 +7,8 @@ import (
 
 	"github.com/ionos-cloud/go-paaskit/infrastructure/paasql"
 	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
-	"github.com/ionos-cloud/go-sample-service/internal/metrics"
-	"github.com/ionos-cloud/go-sample-service/internal/migration"
+	"github.com/ionos-cloud/policies-service/internal/metrics"
+	"github.com/ionos-cloud/policies-service/internal/migration"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cobra"

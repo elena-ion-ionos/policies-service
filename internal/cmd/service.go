@@ -15,7 +15,7 @@ import (
 	"github.com/ionos-cloud/go-paaskit/api/paashttp/router"
 	"github.com/ionos-cloud/go-paaskit/api/paashttp/server"
 	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
-	"github.com/ionos-cloud/go-sample-service/internal/config"
+	"github.com/ionos-cloud/policies-service/internal/config"
 	"github.com/jmoiron/sqlx"
 )
 

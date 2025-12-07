@@ -5,11 +5,13 @@ import (
 )
 
 type Webserver struct {
-	Port    int
-	Service Service
+	Port       int
+	ServerHost string
+	Service    Service
 }
 
 func (w *Webserver) AddFlags(cmd *cobra.Command) {
-	cmd.Flags().IntVar(&w.Port, "port", 8080, "Port to start the webserver API on.")
+	cmd.Flags().IntVar(&w.Port, "port", 8081, "Port to start the webserver API on.")
+	cmd.Flags().StringVar(&w.ServerHost, "server-host", "localhost", "Port to start the webserver API on.")
 	w.Service.AddFlags(cmd)
 }

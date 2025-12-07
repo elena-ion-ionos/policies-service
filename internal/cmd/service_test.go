@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/heptiolabs/healthcheck"
-	"github.com/ionos-cloud/go-sample-service/internal/config"
+	"github.com/ionos-cloud/policies-service/internal/config"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -20,9 +20,9 @@ func checkService(t *testing.T, opts *config.Service, cmd *cobra.Command) {
 	assert.NotNil(t, cmd.Flag("health-check-db-ping-timeout-sec"))
 
 	// Check default values
-	assert.Equal(t, 8081, opts.MetricsPort)
+	assert.Equal(t, 8091, opts.MetricsPort)
 	assert.Equal(t, ":8081", opts.MetricsAddr)
-	assert.Equal(t, 8082, opts.HealthCheckPort)
+	assert.Equal(t, 8092, opts.HealthCheckPort)
 	assert.Equal(t, "0.0.0.0:8082", opts.HealthCheckAddr)
 	assert.Equal(t, 10000, opts.HealthCheckMaxAllowedGoroutines)
 	assert.Equal(t, 3*time.Second, opts.HealthCheckDbPingTimeoutSec)

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ionos-cloud/go-sample-service/internal/model"
+	"github.com/ionos-cloud/policies-service/internal/model"
 )
 
 func TestEmailNotifier_Notify_Success(t *testing.T) {

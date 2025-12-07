@@ -3,7 +3,7 @@ package notification
 import (
 	"context"
 
-	"github.com/ionos-cloud/go-sample-service/internal/model"
+	"github.com/ionos-cloud/policies-service/internal/model"
 )
 
 type SMSNotifier struct{}

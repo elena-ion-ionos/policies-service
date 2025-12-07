@@ -93,7 +93,7 @@ jobs:
             {
               "Project": "TECCM",
               "Issue Type": "Change S",
-              "Labels": "go-sample-service",
+              "Labels": "policies-service",
               "Summary": "Go-Sample-Service-${{ env.image_tag }} Release Information",
               "Affected Business Units and Products (Tree)": [
                 "IONOS Cloud/IONOS Cloud Operations Support Systems (IC-OSS)/IC-Storage Platform",

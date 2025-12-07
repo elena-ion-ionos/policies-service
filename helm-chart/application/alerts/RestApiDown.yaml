@@ -3,9 +3,9 @@ annotations:
   summary: REST API is down.
   description: The REST API has not been up for the last minute.
   runbook: https://github.com/ionos-cloud/paas-dns-ops/blob/main/runbooks/alerts/PaasDnsRestApiDown.md #TODO
-expr: up{job="go-sample-service-staging-app"} == 0
+expr: up{job="policies-service-staging-app"} == 0
 for: 1m
 labels:
-  job: go-sample-service-staging-app
+  job: policies-service-staging-app
   severity: critical
   team: platform-s3

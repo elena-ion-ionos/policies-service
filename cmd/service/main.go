@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ionos-cloud/go-sample-service/internal/cmd"
+	"github.com/ionos-cloud/policies-service/internal/cmd"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -16,7 +16,6 @@ func main() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
 
-	mainCmd.AddCommand(cmd.RegisterUserFunc())
 	mainCmd.AddCommand(cmd.WebserverUser())
 
 	if err := mainCmd.Execute(); err != nil {

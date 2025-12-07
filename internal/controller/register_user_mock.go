@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/ionos-cloud/go-paaskit/service/contract"
-	"github.com/ionos-cloud/go-sample-service/internal/model"
+	"github.com/ionos-cloud/policies-service/internal/model"
 )
 
 type KeysCleanerMock struct {

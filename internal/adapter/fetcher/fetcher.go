@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ionos-cloud/go-sample-service/internal/model"
+	"github.com/ionos-cloud/policies-service/internal/model"
 )
 
 type fetcherImpl struct{}
@@ -14,7 +14,7 @@ func NewFetcher() *fetcherImpl {
 	return &fetcherImpl{}
 }
 
-func (r *fetcherImpl) Fetch(ctx context.Context) (*model.User, error) {
+func (r *fetcherImpl) Fetch(ctx context.Context) (*model.Policy, error) {
 	// This is a placeholder implementation.
 	return nil, fmt.Errorf("not implemented")
 }

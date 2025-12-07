@@ -6,7 +6,7 @@ GO_RUN_TOOLS ?= $(GO) run -modfile ./tools/go.mod
 GO_TEST = $(GO_RUN_TOOLS) gotest.tools/gotestsum --format pkgname
 VERSION ?= 0.0.1
 LDFLAGS ?= -ldflags "-X main.version=$(VERSION)"
-TAG ?= go-sample-service:latest
+TAG ?= policies-service:latest
 ARGS ?= ""
 GITHUB_USER ?= ""# make sure you dontt commit this with your real username
 GITHUB_TOKEN ?= ""# make sure you dontt commit this with your real token
@@ -129,7 +129,7 @@ deploy-local: create-config
 	fi; \
 	make docker-build -e GITHUB_TOKEN=$(GITHUB_TOKEN) GITHUB_USER=$(GITHUB_USER) TAG=$(TAG); \
 	kind load docker-image $(TAG); \
-	helm upgrade --install --create-namespace -n local go-sample-service helm-chart/application/ -f helm-chart/application/values-local.yaml
+	helm upgrade --install --create-namespace -n local policies-service helm-chart/application/ -f helm-chart/application/values-local.yaml
 
 .PHONY: db-cleanup
 db-cleanup:

@@ -3,9 +3,9 @@ package port
 import (
 	"context"
 
-	"github.com/ionos-cloud/go-sample-service/internal/model"
+	"github.com/ionos-cloud/policies-service/internal/model"
 )
 
 type Notifier interface {
-	Notify(ctx context.Context, user *model.User, message string) error
+	Notify(ctx context.Context, policy *model.Policy, message string) error
 }

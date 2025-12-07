@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/ionos-cloud/go-sample-service/internal/config"
+	"github.com/ionos-cloud/policies-service/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )

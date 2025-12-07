@@ -3,6 +3,8 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/ionos-cloud/policies-service/internal/adapter/dbrepo"
+	policiesApi "github.com/ionos-cloud/policies-service/internal/api"
 	"net/http"
 	"os"
 	"time"
@@ -19,13 +21,13 @@ import (
 	"github.com/ionos-cloud/go-paaskit/api/paashttp/server"
 	"github.com/ionos-cloud/go-paaskit/api/paashttp/tracing"
 	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
-	"github.com/ionos-cloud/go-sample-service/internal/api"
-	"github.com/ionos-cloud/go-sample-service/internal/config"
-	"github.com/ionos-cloud/go-sample-service/internal/service"
+	//"github.com/ionos-cloud/policies-service/internal/api"
+	"github.com/ionos-cloud/policies-service/internal/config"
+	"github.com/ionos-cloud/policies-service/internal/service"
 	"github.com/spf13/cobra"
 )
 
-var WebserverUsername = "webserver-user"
+var WebserverUsername = "webserver"
 
 func WebserverUser() *cobra.Command {
 	var cfg config.Webserver
@@ -53,8 +55,10 @@ func RunWebserverUser(ctx context.Context, cfg *config.Webserver) error {
 	svc := MustNewService(ctx, WebserverUsername, cfg.Service)
 
 	dbConn := config.MustNewDB(cfg.Service.Database)
-	// ctrl, _ := newRegisterUserCtrl(cfg, dbConn)
-	registerUserService := service.MustNewWebServerUser(&cfg.Service)
+	_, policyRepo := dbrepo.MustCreateFromConfig(cfg.Service.Database)
+	//trebuie sa mi creez repoul de database
+	// ctrl, _ := newRegisterLifecycleCtrl(cfg, dbConn)
+	registerUserService := service.MustNewWebServerUser(&cfg.Service, cfg.ServerHost, policyRepo, nil)
 
 	svc.StartObservabilityServer()
 
@@ -86,7 +90,7 @@ func RunWebserverUser(ctx context.Context, cfg *config.Webserver) error {
 	return nil
 }
 
-func CreateHttpServer(cfg *config.Webserver, userApi *service.UserApi) (*http.Server, error) {
+func CreateHttpServer(cfg *config.Webserver, userApi *service.PoliciesApi) (*http.Server, error) {
 	tracing.Configure()
 	newRouter := router.New()
 	newRouter.Use(cors.Middleware)
@@ -111,8 +115,8 @@ func CreateHttpServer(cfg *config.Webserver, userApi *service.UserApi) (*http.Se
 	return setupTheHttpServer(newRouter, userApi, cfg.Port), nil
 }
 
-func setupTheHttpServer(router *chi.Mux, mgmt user_api.ServerInterface, port int) *http.Server {
-	user_api.HandlerWithOptions(mgmt, user_api.ChiServerOptions{
+func setupTheHttpServer(router *chi.Mux, mgmt policiesApi.ServerInterface, port int) *http.Server {
+	policiesApi.HandlerWithOptions(mgmt, policiesApi.ChiServerOptions{
 		BaseRouter: router,
 	})
 

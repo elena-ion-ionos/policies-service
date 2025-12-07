@@ -92,7 +92,7 @@ jobs:
         uses: mvasigh/dispatch-action@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          repo: go-sample-service # you need to put your repo name here
+          repo: policies-service # you need to put your repo name here
           owner: ionos-cloud
           event_type: deploy
           message: |

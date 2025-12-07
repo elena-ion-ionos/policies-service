@@ -1,5 +1,5 @@
 ---
-package: user_api
+package: api
 generate:
   chi-server: true
   models: true
