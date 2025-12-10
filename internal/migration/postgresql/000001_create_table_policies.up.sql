@@ -1,7 +1,9 @@
-CREATE TABLE if not exists policies (
-     id VARCHAR(100),
-     name VARCHAR(100),
-     prefix VARCHAR(255),
-     action   VARCHAR(255) ,
-     time   VARCHAR(255)
+CREATE TABLE if not exists policies
+(
+    id         uuid PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    prefix     VARCHAR(255) NOT NULL,
+    action     VARCHAR(255) NOT NULL,
+    time       VARCHAR(255) NOT NULL,
+    created_at timestamp DEFAULT ('now'::text)::timestamp without time zone
 );

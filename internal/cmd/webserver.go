@@ -56,8 +56,6 @@ func RunWebserverUser(ctx context.Context, cfg *config.Webserver) error {
 
 	dbConn := config.MustNewDB(cfg.Service.Database)
 	_, policyRepo := dbrepo.MustCreateFromConfig(cfg.Service.Database)
-	//trebuie sa mi creez repoul de database
-	// ctrl, _ := newRegisterLifecycleCtrl(cfg, dbConn)
 	registerUserService := service.MustNewWebServerUser(&cfg.Service, cfg.ServerHost, policyRepo, nil)
 
 	svc.StartObservabilityServer()

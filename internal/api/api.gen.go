@@ -23,18 +23,22 @@ import (
 type Metadata struct {
 	// CreatedAt The date and time when the entity was created.
 	CreatedAt time.Time `json:"createdAt"`
-
-	// CreatedBy Identifier of the user who created this record.
-	CreatedBy string `json:"createdBy"`
 }
 
 // Policy defines model for Policy.
 type Policy struct {
 	Action string `json:"action"`
 
+	// Id The resource's unique identifier.
+	Id *string `json:"id,omitempty"`
+
 	// Metadata Metadata about entity creation.
 	Metadata *Metadata `json:"metadata,omitempty"`
 	Name     string    `json:"name"`
+	Prefix   string    `json:"prefix"`
+
+	// Time Number of days or ISO8601 duration
+	Time string `json:"time"`
 }
 
 // PostPoliciesJSONRequestBody defines body for PostPolicies for application/json ContentType.
@@ -348,18 +352,19 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/8SWTW/bMAyG/wrB7eg16VYMg2/9AIoA+wi69VT0oFh0o8KWVIlaagT+74PkOEvipO0O",
-	"7W6GRZF8n5d0ssTC1NZo0uwxX6Iv5lSL9PiNWEjBIj5L8oVTlpXRmK9PQMxMYCDNihsoHIkYcIQZWmcs",
-	"OVaUMqUTkqc8TPVrTiAFEwgtgVVNsJiTBp5Tn3YhPKwSxMylcbVgzDHe+hBvYIbcWMIcPTul77DN+opn",
-	"zbDiRMbEpSIHpkyFgicHi7npywDPlQdHhXGp5E72NkNHD0E5kpjfbIjbLHu7vmZm91RwbGpqKlWkjrbx",
-	"iKJrbTnUUW948N5RiTm+G/11bLSya7T2qs1Qi5r2JrOOSvW49yhxHKD6HupZh0mKxoNxMPn548vn8THI",
-	"4JLXz9JJzaxLZ73WVcUhpXhf6dKkLhVXlGZEeVAe7oNnEBroUdS2otjXdbTu/Or6Ak6nE8zwNznf9X58",
-	"ND4aR2nGkhZWYY6f0qsMreB5Aj+y0ZGVC3eUxjMak6RNJOZ4STztY6Iwb432XfzH8TjNttFMOl0V1laq",
-	"SJdH975ztDMoPimm2j/n42pE2jUX4ZxoOizb3nxVniOBtYQY4kNdC9f0x6KqoFIlFU1R0UZkhtb4PWqn",
-	"xm/LfQjk+czI5p+UvkTg9pywC9QO+B6/StVdjFt4mv4bsIPzPL0FAZoWu0ibFDtyoSI/WirZdotUEdMQ",
-	"8UV6fxVjJzLNohM1MTmP+c0SVewpzif2e4xK4i6qbEP27vrdDjCeDBd7oLprV8bROHnRBW0YShP0LqhO",
-	"H4gBJJg1MLmIBQ4t2ptCGb/BbKWP0wrSAa4p5BDLS2IQ3a/TGp4N+/Y2vDq8//sleDO3gpXiqT140q9r",
-	"2/2TOTj7bdv+CQAA///fUJHNcAkAAA==",
+	"H4sIAAAAAAAC/8SWz0/jOhDH/xVr3pPeJaXJo/AgNx5IqNLuUrFwQhym8YQaJbbxj4Woyv++stN226YF",
+	"9gB7i+zxeL6f+Y6VORSq1kqSdBbyOdhiRjXGz6/kkKPD8M3JFkZoJ5SEfLXDcKq8YySdcA0rDGEIOIAE",
+	"tFGajBMUM8Ud4meun+pmRoyjI4aSMydqYs8zkszNaJn2GS1bJAiZS2VqdJBDODUIJyAB12iCHKwzQj5A",
+	"2yZg6MkLQxzyu7Xr71ehavpIhYM2gYmqRNGEyjaLxqIrcb6dPQHBdwsxZJU3Bf1jmZfiyRMTPKgoBZlQ",
+	"O71grauQKzsqj/87Pc0GaXmUDUZUFgM8QT6gMiunhxmOTtICggrkV7JqIHfGU9KvpF7r0d+GSsjhr+Gv",
+	"jg4X7RyuetkmILGmnbK0oVK87NyKnHuav/l6SoapknFsLFOGjb9fnRynGePeRC+82ZtYzOrqZEl9cWO/",
+	"X+G8kKWKVQoXYd7MhGXCskdvHUPJFphDXbeWDDu/vr1gZ5MxJPCDjO1qzw7SgzRIU5okagE5HMalBDS6",
+	"WbTAUAdvLPzwQNG+wSJR2phDDpfkJsuYIMxqJW0X/2+aRu8r6UjGo6h1JYp4ePhoO291DQpfwlFt3+rj",
+	"wqztigsag02HZbM3X4R1gcBKQgixvq7RNMttrCpWiZKKpqhoLTIBrewOtRNlN+U+ebLuf8Wb31L6HoGb",
+	"Pgnub3t8sw+5dRvjBp5m+RRt4TyPqwyZpOdtpE2MHRpfkR3OBW+7QarIUR/xRVy/DrFjHr1osCZHxkJ+",
+	"NwcRagr+hOUch8doG1WyJnt7/O57GEf9we6p7srlwRqjdx2QyrFSebkNqtPHsAeJTRs2vggX7Bu0T4WS",
+	"foK34uO0gLSHawzZx/KSHEPmQ8gKnva75tZ/OLw/+xJ8Wre85vjaHLzar1vd/ens9X7btj8DAAD//yxL",
+	"OrmQCQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

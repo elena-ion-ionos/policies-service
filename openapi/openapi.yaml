@@ -95,15 +95,16 @@ components:
           type: string
           format: date-time
           description: The date and time when the entity was created.
-        createdBy:
-          type: string
-          description: Identifier of the user who created this record.
       required:
         - createdAt
-        - createdBy
     Policy:
       type: object
       properties:
+        id:
+          description: The resource's unique identifier.
+          type: string
+          example: 15f67991-0f51-4efc-a8ad-ef1fb31a480c
+          readOnly: true
         name:
           type: string
         prefix:

@@ -1,8 +1,15 @@
 package model
 
+import (
+	"github.com/google/uuid"
+	"time"
+)
+
 type Policy struct {
-	Name   string
-	Prefix string
-	Action string
-	Time   string
+	ID        uuid.UUID
+	Name      string
+	Prefix    string
+	Action    string
+	Time      string
+	CreatedAt time.Time
 }

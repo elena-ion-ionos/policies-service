@@ -25,12 +25,16 @@ func (c *PolicyConverter) withHost(Host string) {
 func (c *PolicyConverter) ConvertToModel(a *PolicyApi, m *model.Policy) error {
 	m.Name = a.Properties.Name
 	m.Action = a.Properties.Action
+	m.Prefix = a.Properties.Prefix
+	m.Time = a.Properties.Time
 	return nil
 }
 
 func (c *PolicyConverter) ConvertToApi(m *model.Policy, a *PolicyApi) error {
 	a.Properties.Name = m.Name
 	a.Properties.Action = m.Action
+	a.Properties.Prefix = m.Prefix
+	a.Properties.Time = m.Time
 	return nil
 }
 
@@ -39,9 +43,3 @@ func NewReaderWriter(host string) ReaderWriter {
 	converter.withHost(host)
 	return crud.NewReaderWriter(converter)
 }
-
-//func (PolicyConverter) ConvertToModel(a *PolicyApi, m *model.Policy) error {
-//	m.Name = a.Properties.Name
-//	m.Action = a.Properties.Action
-//	return nil
-//}

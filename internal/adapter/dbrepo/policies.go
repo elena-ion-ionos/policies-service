@@ -6,10 +6,14 @@ import (
 	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
 	"github.com/ionos-cloud/policies-service/internal/metrics"
 	"github.com/ionos-cloud/policies-service/internal/model"
+	//"github.com/prometheus/client_golang/prometheus"
 )
 
+//the adapter acts like a bridge between the database and the bussines logic
+
 const (
-	createLifecycleRuleQuery = "INSERT INTO policies (name, prefix, action, time ) VALUES ($1 , $2, $3, $4)"
+	createPolicyQuery = "INSERT INTO policies (id, name, prefix, action, time ) VALUES ($1 , $2, $3, $4, $5)"
+	getPolicies       = "SELECT * FROM policies"
 )
 
 func txRollback(ctx context.Context, tx *sql.Tx) {
@@ -37,8 +41,25 @@ func (p PolicyRepoImpl) Save(ctx context.Context, policy *model.Policy) error {
 	return tx.Commit()
 }
 
+func (p PolicyRepoImpl) Get(ctx context.Context) ([]*model.Policy, error) {
+	//paaslog.DebugCf(ctx, "listing keys, contractNumber: %v, userID: %v", contractNumber, userID)
+
+	var dboPolicies []PolicyDBO
+	err := p.DB.SelectContext(ctx, &dboPolicies, getPolicies)
+	if err != nil {
+		return nil, err
+	}
+
+	policies := make([]*model.Policy, 0)
+	for _, p := range dboPolicies {
+		modelPolicy := NewPolicyFromPolicyDBO(p)
+		policies = append(policies, &modelPolicy)
+	}
+	return policies, nil
+}
+
 func createPolicy(ctx context.Context, tx *sql.Tx, policy *model.Policy) (*model.Policy, error) {
-	_, err := tx.ExecContext(ctx, createLifecycleRuleQuery,
-		policy.Name, policy.Prefix, policy.Action, policy.Time)
+	_, err := tx.ExecContext(ctx, createPolicyQuery,
+		policy.ID, policy.Name, policy.Prefix, policy.Action, policy.Time)
 	return nil, err
 }
