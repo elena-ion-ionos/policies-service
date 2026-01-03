@@ -17,6 +17,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Metadata Metadata about entity creation.
@@ -44,8 +45,8 @@ type Policy struct {
 // PostPoliciesJSONRequestBody defines body for PostPolicies for application/json ContentType.
 type PostPoliciesJSONRequestBody = Policy
 
-// PutRulesIdJSONRequestBody defines body for PutRulesId for application/json ContentType.
-type PutRulesIdJSONRequestBody = Policy
+// PutPoliciesIdJSONRequestBody defines body for PutPoliciesId for application/json ContentType.
+type PutPoliciesIdJSONRequestBody = Policy
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -56,14 +57,14 @@ type ServerInterface interface {
 	// (POST /policies)
 	PostPolicies(w http.ResponseWriter, r *http.Request)
 	// Delete a lifecycle policy by ID
-	// (DELETE /rules/{id})
-	DeleteRulesId(w http.ResponseWriter, r *http.Request, id string)
-	// Get a user by ID
-	// (GET /rules/{id})
-	GetRulesId(w http.ResponseWriter, r *http.Request, id string)
+	// (DELETE /policies/{id})
+	DeletePoliciesId(w http.ResponseWriter, r *http.Request, id string)
+	// Get a policy by ID
+	// (GET /policies/{id})
+	GetPoliciesId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Update a lifecycle policy by ID
-	// (PUT /rules/{id})
-	PutRulesId(w http.ResponseWriter, r *http.Request, id string)
+	// (PUT /policies/{id})
+	PutPoliciesId(w http.ResponseWriter, r *http.Request, id string)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -83,20 +84,20 @@ func (_ Unimplemented) PostPolicies(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete a lifecycle policy by ID
-// (DELETE /rules/{id})
-func (_ Unimplemented) DeleteRulesId(w http.ResponseWriter, r *http.Request, id string) {
+// (DELETE /policies/{id})
+func (_ Unimplemented) DeletePoliciesId(w http.ResponseWriter, r *http.Request, id string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Get a user by ID
-// (GET /rules/{id})
-func (_ Unimplemented) GetRulesId(w http.ResponseWriter, r *http.Request, id string) {
+// Get a policy by ID
+// (GET /policies/{id})
+func (_ Unimplemented) GetPoliciesId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
 // Update a lifecycle policy by ID
-// (PUT /rules/{id})
-func (_ Unimplemented) PutRulesId(w http.ResponseWriter, r *http.Request, id string) {
+// (PUT /policies/{id})
+func (_ Unimplemented) PutPoliciesId(w http.ResponseWriter, r *http.Request, id string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -139,8 +140,8 @@ func (siw *ServerInterfaceWrapper) PostPolicies(w http.ResponseWriter, r *http.R
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// DeleteRulesId operation middleware
-func (siw *ServerInterfaceWrapper) DeleteRulesId(w http.ResponseWriter, r *http.Request) {
+// DeletePoliciesId operation middleware
+func (siw *ServerInterfaceWrapper) DeletePoliciesId(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
@@ -155,7 +156,7 @@ func (siw *ServerInterfaceWrapper) DeleteRulesId(w http.ResponseWriter, r *http.
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteRulesId(w, r, id)
+		siw.Handler.DeletePoliciesId(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -165,14 +166,14 @@ func (siw *ServerInterfaceWrapper) DeleteRulesId(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// GetRulesId operation middleware
-func (siw *ServerInterfaceWrapper) GetRulesId(w http.ResponseWriter, r *http.Request) {
+// GetPoliciesId operation middleware
+func (siw *ServerInterfaceWrapper) GetPoliciesId(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, chi.URLParam(r, "id"), &id)
 	if err != nil {
@@ -181,7 +182,7 @@ func (siw *ServerInterfaceWrapper) GetRulesId(w http.ResponseWriter, r *http.Req
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetRulesId(w, r, id)
+		siw.Handler.GetPoliciesId(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -191,8 +192,8 @@ func (siw *ServerInterfaceWrapper) GetRulesId(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// PutRulesId operation middleware
-func (siw *ServerInterfaceWrapper) PutRulesId(w http.ResponseWriter, r *http.Request) {
+// PutPoliciesId operation middleware
+func (siw *ServerInterfaceWrapper) PutPoliciesId(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
@@ -207,7 +208,7 @@ func (siw *ServerInterfaceWrapper) PutRulesId(w http.ResponseWriter, r *http.Req
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PutRulesId(w, r, id)
+		siw.Handler.PutPoliciesId(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -337,13 +338,13 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/policies", wrapper.PostPolicies)
 	})
 	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/rules/{id}", wrapper.DeleteRulesId)
+		r.Delete(options.BaseURL+"/policies/{id}", wrapper.DeletePoliciesId)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/rules/{id}", wrapper.GetRulesId)
+		r.Get(options.BaseURL+"/policies/{id}", wrapper.GetPoliciesId)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/rules/{id}", wrapper.PutRulesId)
+		r.Put(options.BaseURL+"/policies/{id}", wrapper.PutPoliciesId)
 	})
 
 	return r
@@ -352,19 +353,20 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/8SWz0/jOhDH/xVr3pPeJaXJo/AgNx5IqNLuUrFwQhym8YQaJbbxj4Woyv++stN226YF",
-	"9gB7i+zxeL6f+Y6VORSq1kqSdBbyOdhiRjXGz6/kkKPD8M3JFkZoJ5SEfLXDcKq8YySdcA0rDGEIOIAE",
-	"tFGajBMUM8Ud4meun+pmRoyjI4aSMydqYs8zkszNaJn2GS1bJAiZS2VqdJBDODUIJyAB12iCHKwzQj5A",
-	"2yZg6MkLQxzyu7Xr71ehavpIhYM2gYmqRNGEyjaLxqIrcb6dPQHBdwsxZJU3Bf1jmZfiyRMTPKgoBZlQ",
-	"O71grauQKzsqj/87Pc0GaXmUDUZUFgM8QT6gMiunhxmOTtICggrkV7JqIHfGU9KvpF7r0d+GSsjhr+Gv",
-	"jg4X7RyuetkmILGmnbK0oVK87NyKnHuav/l6SoapknFsLFOGjb9fnRynGePeRC+82ZtYzOrqZEl9cWO/",
-	"X+G8kKWKVQoXYd7MhGXCskdvHUPJFphDXbeWDDu/vr1gZ5MxJPCDjO1qzw7SgzRIU5okagE5HMalBDS6",
-	"WbTAUAdvLPzwQNG+wSJR2phDDpfkJsuYIMxqJW0X/2+aRu8r6UjGo6h1JYp4ePhoO291DQpfwlFt3+rj",
-	"wqztigsag02HZbM3X4R1gcBKQgixvq7RNMttrCpWiZKKpqhoLTIBrewOtRNlN+U+ebLuf8Wb31L6HoGb",
-	"Pgnub3t8sw+5dRvjBp5m+RRt4TyPqwyZpOdtpE2MHRpfkR3OBW+7QarIUR/xRVy/DrFjHr1osCZHxkJ+",
-	"NwcRagr+hOUch8doG1WyJnt7/O57GEf9we6p7srlwRqjdx2QyrFSebkNqtPHsAeJTRs2vggX7Bu0T4WS",
-	"foK34uO0gLSHawzZx/KSHEPmQ8gKnva75tZ/OLw/+xJ8Wre85vjaHLzar1vd/ens9X7btj8DAAD//yxL",
-	"OrmQCQAA",
+	"H4sIAAAAAAAC/8RW3W/bNhD/V4jbgG2AFEuJ86W3rgYKA9sabPVT0YeTeKwZSCTDj6WCof99IGV7seU0",
+	"3YBlbwJ5vLvfx529gUZ3RitS3kG1AdesqcP0+St55OgxfnNyjZXGS62g2t8wrHXwjJSXvmeNJYwBZ5CB",
+	"sdqQ9ZJSpnRD/I2fpvqwJsbRE0PFmZcdscc1KebXtEv7iI5tE8TMQtsOPVQQX+XxBWTge0NQgfNWqs8w",
+	"DBlYegjSEofq45Pyn/ahur6nxsOQwZ1uZdPHzg6bxmZscXOcPQPJTwOx5HSwDf3gWFDyIRCTPKIQkmzs",
+	"nb5gZ9qYq7wUV9e3t2VeiMsyn5NocrxBnpMoRX1R4vymaCCiQP5etT1U3gbKpp10TzT63pKACr6b/a3o",
+	"bCvnbK/lkIHCjk7CMpaE/HLyKvE8wfxb6GqyTAvGsXdMW7b84/3NVVEyHmzywovapGb2pbMd69uKU73i",
+	"e6mETl1Kn8j8sJaOScfug/MMFdvSHPtaObLs7e+rBXtzt4QM/iTrxt7Ls+KsiNC0IYVGQgUX6SgDg36d",
+	"LDAz0RtbP3ymZN9okQRtyaGCd+TvdjERmDNauTH+vCiS97XypNJTNKaVTXo8u3ejt0aB4pf01LmXdNya",
+	"ddjzgtZiP9JyqM0v0vnIwB5CDHGh69D2u2tsW9ZKQU3ftPQkMgOj3Qm0d9odwn0I5PzPmvf/COm3ADz0",
+	"SXT/MOG3/E+qHtN4QE+/W0VHdL5NpwyZosdjSvsUu/fSbCP5MM5SS56mLC/S+Y7nJU+OtNiRJ+ug+rgB",
+	"GTuLLoXdNMeVdExY9gT88RB+mpA5n473BPvYMY8GmX/TA6U9EzqoY7pGiAwnVLG6Z8tFLPDSuJ3iZbqR",
+	"lwv242q1XPwURyH+qIxlDpexqK9u+MUt5pfXxVV+WdbzvD6vz/Prel6L26YWBQrI/gXr+9+qEFLkyyoU",
+	"r2DptBO3qjwjZAp5Trx35BlO9DLh1MII/hV8/P9uoVeTLBiOX5u+r4q2MuO/rGcnbhiGvwIAAP//mHac",
+	"swwKAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

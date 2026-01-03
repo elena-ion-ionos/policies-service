@@ -3,10 +3,11 @@ package dbrepo
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/ionos-cloud/go-paaskit/observability/paaslog"
 	"github.com/ionos-cloud/policies-service/internal/metrics"
 	"github.com/ionos-cloud/policies-service/internal/model"
-	//"github.com/prometheus/client_golang/prometheus"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 //the adapter acts like a bridge between the database and the bussines logic
@@ -14,6 +15,8 @@ import (
 const (
 	createPolicyQuery = "INSERT INTO policies (id, name, prefix, action, time ) VALUES ($1 , $2, $3, $4, $5)"
 	getPolicies       = "SELECT * FROM policies"
+	getPolicyById     = "SELECT * FROM policies where id=$1"
+	deletePolicyById  = "DELETE FROM policies where id=$1"
 )
 
 func txRollback(ctx context.Context, tx *sql.Tx) {
@@ -41,7 +44,7 @@ func (p PolicyRepoImpl) Save(ctx context.Context, policy *model.Policy) error {
 	return tx.Commit()
 }
 
-func (p PolicyRepoImpl) Get(ctx context.Context) ([]*model.Policy, error) {
+func (p PolicyRepoImpl) GetPolicies(ctx context.Context) ([]*model.Policy, error) {
 	//paaslog.DebugCf(ctx, "listing keys, contractNumber: %v, userID: %v", contractNumber, userID)
 
 	var dboPolicies []PolicyDBO
@@ -56,6 +59,29 @@ func (p PolicyRepoImpl) Get(ctx context.Context) ([]*model.Policy, error) {
 		policies = append(policies, &modelPolicy)
 	}
 	return policies, nil
+}
+
+func (p PolicyRepoImpl) GetPolicyById(ctx context.Context, id openapi_types.UUID) (*model.Policy, error) {
+	var dboPolicy PolicyDBO
+	err := p.DB.GetContext(ctx, &dboPolicy, getPolicyById, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrIdNotFound
+		}
+		return nil, err
+	}
+	modelPolicy := NewPolicyFromPolicyDBO(dboPolicy)
+	return &modelPolicy, nil
+}
+
+func (p PolicyRepoImpl) DeletePolicyById(ctx context.Context, id string) error {
+	//paaslog.DebugCf(ctx, "listing keys, contractNumber: %v, userID: %v", contractNumber, userID)
+
+	_, err := p.DB.ExecContext(ctx, deletePolicyById, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func createPolicy(ctx context.Context, tx *sql.Tx, policy *model.Policy) (*model.Policy, error) {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ionos-cloud/policies-service/internal/model"
 	"github.com/ionos-cloud/policies-service/internal/port"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 //type RegisterRule interface {
@@ -11,16 +12,16 @@ import (
 //	RegisterPolicy(ctx context.Context, user *model.Policy) error
 //}
 
-type GetPolicies struct {
+type GetPolicyById struct {
 	repo      port.PolicyRepo
 	notifiers []port.Notifier
 }
 
-func NewGetPoliciesCtrl(repo port.PolicyRepo, notifiers ...port.Notifier) (*GetPolicies, error) {
-	return &GetPolicies{repo: repo, notifiers: notifiers}, nil
+func NewGetPolicyByIdCtrl(repo port.PolicyRepo, notifiers ...port.Notifier) (*GetPolicyById, error) {
+	return &GetPolicyById{repo: repo, notifiers: notifiers}, nil
 }
 
-func (s *GetPolicies) GetPolicies(ctx context.Context) ([]*model.Policy, error) {
-	policies, err := s.repo.GetPolicies(ctx)
+func (s *GetPolicyById) GetPolicyById(ctx context.Context, id openapi_types.UUID) (*model.Policy, error) {
+	policies, err := s.repo.GetPolicyById(ctx, id)
 	return policies, err
 }

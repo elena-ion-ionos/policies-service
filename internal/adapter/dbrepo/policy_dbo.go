@@ -17,10 +17,11 @@ type PolicyDBO struct {
 
 func NewPolicyFromPolicyDBO(keyDBO PolicyDBO) model.Policy {
 	return model.Policy{
-		ID:     keyDBO.ID,
-		Name:   keyDBO.Name,
-		Prefix: keyDBO.Prefix,
-		Action: keyDBO.Action,
-		Time:   keyDBO.Time,
+		ID:        keyDBO.ID,
+		Name:      keyDBO.Name,
+		Prefix:    keyDBO.Prefix,
+		Action:    keyDBO.Action,
+		Time:      keyDBO.Time,
+		CreatedAt: keyDBO.CreatedAt,
 	}
 }

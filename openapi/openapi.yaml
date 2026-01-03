@@ -31,15 +31,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Policy'
-  /rules/{id}:
+  /policies/{id}:
     get:
-      summary: Get a user by ID
+      summary: Get a policy by ID
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+            format: uuid
+          example: "fb68d39a-5706-51b4-b2b2-7b4bf9cbf0af"
+          description: The ID (UUID) of the policy.
       responses:
         '200':
           description: User found

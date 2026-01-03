@@ -31,10 +31,17 @@ func (c *PolicyConverter) ConvertToModel(a *PolicyApi, m *model.Policy) error {
 }
 
 func (c *PolicyConverter) ConvertToApi(m *model.Policy, a *PolicyApi) error {
+	a.Type = string("policy")
 	a.Properties.Name = m.Name
 	a.Properties.Action = m.Action
 	a.Properties.Prefix = m.Prefix
 	a.Properties.Time = m.Time
+	a.Id = &m.ID
+	var metadata Metadata
+	metadata.CreatedAt = m.CreatedAt
+
+	a.Metadata = &metadata
+
 	return nil
 }
 
