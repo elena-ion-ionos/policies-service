@@ -256,4 +256,3 @@ cosign.key
 **/charts/*.tgz
 build
 .scannerwork
-service
