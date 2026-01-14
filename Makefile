@@ -29,7 +29,7 @@ generate:
 	$(GO) generate ./...
 
 .PHONY: api
-api: internal/api/api.gen.go
+api: internal/api/api.gen.go internal/api/s3ionos/s3ionos.gen.go
 
 internal/api:
 	mkdir -p $@
@@ -38,6 +38,15 @@ internal/api:
 internal/api/api.gen.go: openapi/openapi.yaml openapi/config.yaml internal/api
 	$(GO_RUN_TOOLS) github.com/deepmap/oapi-codegen/cmd/oapi-codegen \
 		-config ./openapi/config.yaml $< > $@
+
+internal/api/s3ionos:
+	mkdir -p internal/api/s3ionos
+
+.PHONY: internal/api/s3ionos/s3ionos.gen.go
+internal/api/s3ionos/s3ionos.gen.go: openapi/s3ionos/s3ionos.yaml openapi/s3ionos/config.yaml internal/api/s3ionos
+	$(GO_RUN_TOOLS) github.com/deepmap/oapi-codegen/cmd/oapi-codegen \
+			-config ./openapi/s3ionos/config.yaml openapi/s3ionos/s3ionos.yaml > internal/api/s3ionos/s3ionos.gen.go
+
 
 docker-build: ## Build docker image
 	docker build -t $(TAG) --secret id=github_token .

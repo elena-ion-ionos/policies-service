@@ -6,6 +6,8 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+//go:generate mockgen -source=policy_repo.go -destination=../mocks/port/mock_policy_repo.go -package=mocks
+
 // portul e o interfata ceva abstract care va definii operatii de write and read ce va comunica cu surse externe: ex:
 // Ex: Poate sa scrie sau sa citeasca din fisiere, sau din baze de date
 // interfata ce defineste operatiile cu baza de date

@@ -42,19 +42,9 @@ func (l PoliciesApi) PutPoliciesId(w http.ResponseWriter, r *http.Request, id st
 	panic("implement me")
 }
 
-func (l PoliciesApi) DeleteRulesId(w http.ResponseWriter, r *http.Request, id string) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (l PoliciesApi) PutRulesId(w http.ResponseWriter, r *http.Request, id string) {
-	//TODO implement me
-	panic("implement me")
-}
-
 // aici trebuie sa pasez parametri pentru controller
 func MustNewWebServerUser(cfg *config.Service, serverHost string, repo port.PolicyRepo, notifier port.Notifier) *PoliciesApi {
-	createPolicyCtrl, err := controller.NewCreatePolicyCtrl(repo, notifier)
+	createPolicyCtrl, err := controller.NewCreatePolicyCtrl(repo)
 	getPolicyCtrl, err := controller.NewGetPoliciesCtrl(repo, notifier)
 	getPolicyByIDCtrl, err := controller.NewGetPolicyByIdCtrl(repo, notifier)
 	deletePolicyByIdCtrl, err := controller.NewDeletePolicyByIdCtrl(repo, notifier)

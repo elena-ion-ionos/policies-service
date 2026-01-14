@@ -9,19 +9,12 @@ import (
 	"github.com/ionos-cloud/policies-service/internal/port"
 )
 
-//de sters
-//type RegisterRule interface {
-//	// RegisterRule registers a new user and notifies them.
-//	RegisterPolicy(ctx context.Context, user *model.Policy) error
-//}
-
 type CreatePolicy struct {
-	repo      port.PolicyRepo
-	notifiers []port.Notifier
+	repo port.PolicyRepo
 }
 
-func NewCreatePolicyCtrl(repo port.PolicyRepo, notifiers ...port.Notifier) (*CreatePolicy, error) {
-	return &CreatePolicy{repo: repo, notifiers: notifiers}, nil
+func NewCreatePolicyCtrl(repo port.PolicyRepo) (*CreatePolicy, error) {
+	return &CreatePolicy{repo: repo}, nil
 }
 
 func (s *CreatePolicy) RegisterPolicy(ctx context.Context, policy *model.Policy) error {

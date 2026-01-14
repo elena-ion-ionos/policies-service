@@ -3,14 +3,100 @@ package service
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/ionos-cloud/policies-service/internal/api"
+	"github.com/ionos-cloud/policies-service/internal/controller"
+	mocks "github.com/ionos-cloud/policies-service/internal/mocks/port"
 	"github.com/ionos-cloud/policies-service/internal/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 )
+
+func Test_PostPolicies(t *testing.T) {
+	mc := gomock.NewController(t)
+	writer := api.NewReaderWriter("http://localhost:8080")
+
+	mockPolicyRepo := mocks.NewMockPolicyRepo(mc)
+	createPolicyCtrl, err := controller.NewCreatePolicyCtrl(mockPolicyRepo)
+	if err != nil {
+		t.Fail()
+	}
+	policiesApi := &PoliciesApi{
+		CreatePolicyController: createPolicyCtrl,
+		Helper:                 writer,
+	}
+
+	tests := []struct {
+		name           string
+		policy         *model.Policy
+		wantErr        bool
+		responseStatus int
+		expected       func()
+	}{
+		{
+			name: "success",
+			policy: &model.Policy{
+				Name:      "test1",
+				Prefix:    "",
+				Action:    "",
+				Time:      "",
+				Metadata:  nil,
+				CreatedAt: time.Time{},
+			},
+			responseStatus: http.StatusCreated,
+			expected: func() {
+				mockPolicyRepo.EXPECT().Save(gomock.Any(), gomock.Any()).Times(1).Return(nil)
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt.expected()
+		recorder := httptest.NewRecorder()
+		policyBody := map[string]interface{}{
+			"properties": map[string]interface{}{
+				"name":   tt.policy.Name,
+				"prefix": tt.policy.Prefix,
+				"action": tt.policy.Action,
+				"time":   tt.policy.Time,
+			},
+		}
+		policyBytes, _ := json.Marshal(policyBody)
+
+		bodyReader := bytes.NewBuffer(policyBytes)
+		req, err := http.NewRequestWithContext(context.Background(), "POST", "/", bodyReader)
+		req.Header.Set("Content-Type", "application/json")
+
+		require.Nil(t, err)
+
+		policiesApi.PostPolicies(recorder, req)
+
+		body, err := io.ReadAll(recorder.Body)
+		require.Nil(t, err)
+		assert.Equal(t, tt.responseStatus, recorder.Code)
+		if tt.responseStatus != http.StatusCreated {
+			return
+		}
+		var response struct {
+			Properties struct {
+				Name string `json:"name"`
+			} `json:"properties"`
+		}
+
+		err = json.Unmarshal(body, &response)
+		require.Nil(t, err)
+		if !tt.wantErr {
+			assert.Equal(t, tt.policy.Name, response.Properties.Name)
+		}
+		require.NotEmpty(t, response.Properties)
+	}
+}
 
 func Test_LoadRequestBody(t *testing.T) {
 	writer := api.NewReaderWriter("http://localhost:8080")

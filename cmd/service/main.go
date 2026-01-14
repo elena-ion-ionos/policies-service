@@ -13,6 +13,7 @@ import (
 var mainCmd = &cobra.Command{}
 
 func main() {
+
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
 

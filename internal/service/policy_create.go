@@ -2,17 +2,20 @@ package service
 
 import (
 	"context"
-	"net/http"
-
 	"github.com/ionos-cloud/go-paaskit/api/paashttp"
 	"github.com/ionos-cloud/go-paaskit/api/paashttp/crud"
+	"net/http"
+
 	"github.com/ionos-cloud/policies-service/internal/model"
 )
 
 func (l *PoliciesApi) PostPolicies(w http.ResponseWriter, r *http.Request) {
 	paashttp.Handle("GetPolicies All Policies", w, r, func(ctx context.Context) error {
-		policy, _ := l.loadRequestBody(ctx, r)
-		err := l.CreatePolicyController.RegisterPolicy(ctx, policy)
+		policy, err := l.loadRequestBody(ctx, r)
+		if err != nil {
+			return err
+		}
+		err = l.CreatePolicyController.RegisterPolicy(ctx, policy)
 		if err != nil {
 			return err
 		}
@@ -25,8 +28,10 @@ func (l *PoliciesApi) loadRequestBody(ctx context.Context, r *http.Request) (*mo
 		return &model.Policy{}, nil
 	}
 	requestedPolicy, err := l.Helper.ReadOne(ctx, r)
+	err = checkError(err)
 	if err != nil {
 		return nil, err
 	}
+
 	return requestedPolicy, nil
 }
